@@ -1,3 +1,11 @@
+# ----------------------------------------------------------------------------
+# CS 181 | Practical 1 | Warmup
+# Casey Grun
+# 
+# warmup.py
+# Calls the k-means clustering algorithm defined in kmeans.py
+# ----------------------------------------------------------------------------
+
 import numpy as np
 import kmeans
 

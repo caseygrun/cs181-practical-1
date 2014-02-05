@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# CS 181 | Practical 1 |Warmup
+# CS 181 | Practical 1 | Warmup
 # Casey Grun
 # 
 # kmeans.py
