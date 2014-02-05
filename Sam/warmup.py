@@ -11,7 +11,7 @@ def unpickle_CIFAR(file):
     fo.close()
     return dict
 
-def init_Kmeans(data, k):
+def init_kmeans(data, k):
     return [random(0,k-1) for x in range(len(data))]
 
 def add_lists(a,b):
@@ -20,7 +20,8 @@ def add_lists(a,b):
 def div_list_by_num(list,a):
     return [x/a for x in list]
 
-def cluster_mean(data, k, ks):
+def cluster_mean(data, ks):
+    k=len(ks)
     #num data points for each cluster
     cluster_nums = [0]*k
     #total sum of vectors for each cluster
@@ -31,6 +32,27 @@ def cluster_mean(data, k, ks):
     return [div_list_by_num(cluster_sums[i],cluster_nums[i]) for i in range(k)]
 
 def distances(data, us):
-    diff = x[np.newaxis,:,:] - u[:,np.newaxis,:]
+    diff = data[np.newaxis,:,:] - us[:,np.newaxis,:]
     dist = np.sum(diff**2,axis=-1)
     return dist
+
+def update_cluster(data, ks):
+    dist = distances(data, cluster_mean(data, ks))
+    for i in range(len(ks)):
+        val, idx = min((val, idx) for (idx, val) in enumerate(dist(i)))
+        ks[i] = idx
+    return ks
+
+raw_data = unpickle_CIFAR('data_batch_1')
+data = raw_data['data']
+k=10
+ks = init_kmeans(data, k)
+
+while True:
+    us = cluster_mean(data, ks)
+    newks = update_cluster(data, ks)
+
+    if newks == ks:
+        break
+    else:
+        ks = newks
