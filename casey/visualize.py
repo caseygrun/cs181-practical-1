@@ -17,3 +17,6 @@ def im_show_grid(U):
 
 	plt.show()
 
+def show_sparsity(R):
+	plt.spy(R, precision=1e-3, marker='.', markersize=5)
+	plt.show()
