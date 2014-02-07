@@ -9,27 +9,28 @@ import load_data as load
 
 data = load.load_CIFAR('C:\Users\Sam\git\cs181-practical-1\Sam\data_batch_1')
 
-#data = np.array([[10, 0, 0, 0],
-#              [11, 0, 0, 0],
-#              [9 , 0, 0, 0],
-#              [0 , 8, 0, 0],
-#              [0 , 6, 0, 0],
-#              [0 , 7, 0, 0],
-#              [0 , 0, 9, 0],
-#              [0 , 0, 8, 0],
-#              [0 , 0,10, 0],])
+"""data = np.array([[10, 0, 0, 0],
+              [11, 0, 0, 0],
+              [9 , 0, 0, 0],
+              [0 , 8, 0, 0],
+              [0 , 6, 0, 0],
+              [0 , 7, 0, 0],
+              [0 , 0, 9, 0],
+              [0 , 0, 8, 0],
+              [0 , 0,10, 0],])"""
 k=10
-ks = kmeans.init_kmeans(data, k)
+ks = kmeans.init_kmeans(len(data), k)
 
-"""
+
 while True:
     newks = kmeans.update_cluster(data, k, ks)
 
     if newks == ks:
         break
     else:
-        ks = newks"""
+        ks = newks
 
 #print ks
-for x in kmeans.cluster_mean(data, k, ks):
-    draw.draw_image(x)
+for (i,x) in enumerate(kmeans.cluster_means(data, k, ks)):
+    print str(i) + 'test.jpg'
+    draw.draw_image(x, str(i) + 'test.jpg')

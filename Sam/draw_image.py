@@ -2,13 +2,12 @@ import numpy as np
 #import scipy.misc.pilutil as smp
 from PIL import Image
 
-def draw_image(raw_data):
+def draw_image(raw_data, file):
     """Takes a list of 3072 values as described on the CIFAR page
     and outputs the corresponding image """
     #http://stackoverflow.com/questions/434583/what-is-the-fastest-way-to-draw-an-image-from-discrete-pixel-values-in-python
     #http://stackoverflow.com/questions/10443295/combine-3-separate-numpy-arrays-to-an-rgb-image-in-python
     data = np.array(raw_data)
-    print data.shape
     shape = (3, 1024)
     rgbData = data.reshape(shape)
     rgbData *= 255
@@ -24,7 +23,7 @@ def draw_image(raw_data):
     #rgb_array = rgb_tuples.reshape(shape)
 
     img = Image.fromarray(rgbArray)
-    img.save('test.jpg')
+    img.save(file)
 
     #img = smp.toimage(rgb_array)
     #img.show()

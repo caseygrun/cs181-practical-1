@@ -12,7 +12,8 @@ def unpickle_CIFAR(file):
     return dict
 
 def load_CIFAR(file):
+    """returns np array"""
     rawData = unpickle_CIFAR(file)
     data = np.array(rawData['data'])
-    normData = data/255
-    return normData.tolist()
+    normData = data/255.0
+    return normData
