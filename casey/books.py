@@ -3,6 +3,7 @@ import numpy as np
 import scipy.sparse as sp
 import util
 import kmeans
+import pca
 
 def build_ratings():
 	print "Loading Users..."
@@ -44,24 +45,29 @@ def build_ratings():
 	kmeans.pickle({ "ratings": ratings, "book_isbn_to_index": book_isbn_to_index },"ratings")
 
 def load_ratings():
-	d = kmeans.unpickle("ratings")
+	d = kmeans.unpickle("output/ratings")
 	return (d["ratings"], d["book_isbn_to_index"])
 
-(ratings, book_isbn_to_index) = load_ratings()
 
+(ratings, book_isbn_to_index) = load_ratings()
+# ratings = kmeans.standardize(ratings)
 ratings = ratings.tocsr()
 
-(U,R) = kmeans.cluster2(ratings, 3, kmeans.dist2)
-print U
-print R
+# # do K-means clustering
+# (U,R) = kmeans.cluster2(ratings, 20, kmeans.dist2)
+# print U
+# print R
 
-kmeans.pickle(U,"U")
-kmeans.pickle(R,"R")
+# kmeans.pickle(U,"output/U")
+# kmeans.pickle(R,"output/R")
 
-np.savetxt("U.csv", U)
-np.savetxt("R.csv", R)
+# np.savetxt("output/U.csv", U)
+# np.savetxt("output/R.csv", R)
 
-# import matplotlib.pyplot as plt
 
-# plt.spy(ratings, precision=1e-3, marker='.', markersize=5)
-# plt.show()
+# do PCA
+(w,v) = pca.analyze(ratings,2)
+
+kmeans.pickle((w,v),"output/WV")
+np.savetext("output/W.csv",w)
+np.savetext("output/V.csv",v)

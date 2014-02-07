@@ -16,6 +16,7 @@ DEBUG = True
 def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
+# load and save pickled data structures
 def unpickle(file):
 	"""
 	Loads one of the CIFAR-10 files
@@ -35,7 +36,7 @@ def pickle(array, file):
 	cPickle.dump(array,fo)
 	fo.close()
 
-
+# calculate cartesian distances
 def dist(x,u):
 	"""
 	Given an (n x d) array X, a (k x d) array U, returns a (k x n) array D 
@@ -101,8 +102,8 @@ def standardize(data):
     """
     Take an NxD numpy matrix as input and return a standardized version of it.
     """
-    mean = np.mean(data, axis=0)
-    std  = np.std(data, axis=0)
+    mean = data.mean(axis=0)
+    std  = data.std(axis=0)
     return (data - mean)/std
 
 
@@ -144,7 +145,7 @@ def cluster(X, K, distance):
 	U[0,:] = X[n,:]
 
 	# loop over remaining clusters
-	for k in range(1,K):
+	for k in xrange(1,K):
 		# compute distance between each data point and all clusters so far
 		# D is (k x N)
 		L = distance(X,U[0:k,:])
@@ -160,8 +161,7 @@ def cluster(X, K, distance):
 		i = choice(range(N),p)
 		U[k,:] = X[i,:]
 
-	if DEBUG:
-		print "Clustering..."
+	debug("Clustering...")
 
 	# repeat...
 	while True:
@@ -182,7 +182,7 @@ def cluster(X, K, distance):
 		kp = np.argmin(L,axis=0)
 
 		# assign responsibilities
-		for n in range(N):
+		for n in xrange(N):
 			R[n,kp[n]] = 1
 
 		# ...break if the R's don't change
@@ -235,8 +235,7 @@ def cluster2(X, K, distance):
 	# empty responsibilities
 	R = np.zeros((N,K)) 
 
-	if DEBUG:
-		print "Initializing..."
+	debug("Initializing...")
 
 	# initialize responsibilities with k-means++
 	# pick random data point for initial cluster
@@ -244,7 +243,7 @@ def cluster2(X, K, distance):
 	U[0,:] = X[n,:].toarray()
 
 	# loop over remaining clusters
-	for k in range(1,K):
+	for k in xrange(1,K):
 		debug("%d / %d",(k,K))
 
 		# compute distance between each data point and all clusters so far
@@ -262,8 +261,7 @@ def cluster2(X, K, distance):
 		i = choice(range(N),p)
 		U[k,:] = X[i,:].toarray()
 
-	if DEBUG:
-		print "Clustering..."
+	debug("Clustering...")
 
 	# repeat...
 	while True:
@@ -284,7 +282,7 @@ def cluster2(X, K, distance):
 		kp = np.argmin(L,axis=0)
 
 		# assign responsibilities
-		for n in range(N):
+		for n in xrange(N):
 			R[n,kp[n]] = 1
 
 		# ...break if the R's don't change
@@ -306,7 +304,7 @@ def cluster2(X, K, distance):
 		# and represents the means
 
 		# non-broadcasting version
-		for k in range(K):
+		for k in xrange(K):
 			U[k,:] = X.transpose().dot(R[:,k]) / Nk[k]
 			
 	return (U, R)
