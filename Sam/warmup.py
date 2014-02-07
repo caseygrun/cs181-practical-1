@@ -32,5 +32,4 @@ while True:
 
 #print ks
 for (i,x) in enumerate(kmeans.cluster_means(data, k, ks)):
-    print str(i) + 'test.jpg'
-    draw.draw_image(x, str(i) + 'test.jpg')
+    draw.draw_image(x, str(i))
