@@ -5,13 +5,28 @@
 # 
 # us_utils.py
 # Contains shared utility functions for unsupervised learning
+# 
+# to link this file into your directory, just do this (from the /shared 
+# directory):
+# 
+# ln -s us_utils.py ../YOURNAME/us_utils.py
+# 
 # ----------------------------------------------------------------------------
 
+import numpy as np
+import random
+import bisect
+import collections
 
 # load and save pickled data structures
 def unpickle(file):
 	"""
 	Loads and returns a pickled data structure in the given `file` name
+
+	Example usage:
+
+		data = unpickle('output/U_20_std')
+
 	"""
 	import cPickle
 	fo = open(file, 'rb')
@@ -21,7 +36,12 @@ def unpickle(file):
 
 def pickle(array, file):
 	"""
-	Dumps an array to a file
+	Dumps an array to a file. 
+
+	Example usage:
+
+		pickle(U, 'output/U_20_std')
+		
 	"""
 	import cPickle
 	fo = open(file,'wb')
@@ -68,9 +88,6 @@ def roll(U,R):
 
 # inverse transform sampling
 # http://stackoverflow.com/questions/4113307/pythonic-way-to-select-list-elements-with-different-probability
-import random
-import bisect
-import collections
 
 def cdf(weights):
 	"""
