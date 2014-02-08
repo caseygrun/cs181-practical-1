@@ -23,7 +23,7 @@ def draw_image(raw_data, file):
     #rgb_array = rgb_tuples.reshape(shape)
 
     img = Image.fromarray(rgbArray)
-    img.save(file)
+    img.save("Sam/output/" + file + ".jpg")
 
     #img = smp.toimage(rgb_array)
     #img.show()
