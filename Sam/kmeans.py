@@ -50,5 +50,5 @@ def update_cluster(data, k, ks):
 def objective(data, ks, us):
     sum = 0
     for i in range(len(data)):
-        sum += np.sum((data[i] - us[ks[i]])**2)
+        sum += np.sum((data[i] - us[ks[i]])**2)**2
     return sum
