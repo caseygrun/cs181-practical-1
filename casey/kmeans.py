@@ -8,7 +8,7 @@
 # ----------------------------------------------------------------------------
 
 import numpy as np
-from us_utils import * 
+from shared_utils import * 
 
 # display status information
 DEBUG = True

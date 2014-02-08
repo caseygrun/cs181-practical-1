@@ -3,13 +3,13 @@
 # CS 181 | Practical 1 | Predictions
 # Casey Grun, Rhed Shi, Sam Kim
 # 
-# us_utils.py
+# shared_utils.py
 # Contains shared utility functions for unsupervised learning
 # 
 # to link this file into your directory, just do this (from the /shared 
 # directory):
 # 
-# ln -s us_utils.py ../YOURNAME/us_utils.py
+# ln -s shared_utils.py ../YOURNAME/shared_utils.py
 # 
 # ----------------------------------------------------------------------------
 
