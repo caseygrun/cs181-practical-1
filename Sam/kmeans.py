@@ -46,3 +46,9 @@ def update_cluster(data, k, ks):
         val, idx = min((val, idx) for (idx, val) in enumerate(dist[i]))
         ks[i] = idx
     return ks
+
+def objective(data, ks, us):
+    sum = 0
+    for i in range(len(data)):
+        sum += np.sum((data[i] - us[ks[i]])**2)
+    return sum
