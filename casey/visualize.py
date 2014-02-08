@@ -14,7 +14,8 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 
 def imshape(a,n,m):
 	"""
-	Reshapes an array into an (N x M x 3) array
+	Reshapes an array into an (N x M x 3) array. Use to turn CIFAR images into
+	something that matplotlib.pyplot.imshape can use
 	"""
 	b = a.reshape((n,m,3),order='F').swapaxes(0,1)
 	return b
@@ -37,5 +38,6 @@ def show_sparsity(R):
 	"""
 	Shows a plot showing sparsity 
 	"""
-	plt.spy(R, precision=1e-3, marker='.', markersize=3)
+	plt.spy(R, precision=1e-3, marker='.', markersize=2)
 	plt.show()
+
