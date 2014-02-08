@@ -70,8 +70,27 @@ def svd(X,K):
 
 def project(X,V):
 	"""
-	Projects the sparse matrix X on to the basis V.
+	Projects the array X on to the basis V.
 
-	X is (N x D) and V is (K x D)
+	X is (N x D) and V is (K x D) 
+	-> X' = X . V^T is (N x K)
 	"""
-	pass
+	return X.dot(V.transpose())
+
+def project2(X,V):
+	"""
+	Projects the sparse matrix X on to the basis V (non-broadcasting version 
+	of `project`).
+
+	X is (N x D) and V is (K x D) 
+	-> X' = X . V^T is (N x K)
+	"""
+	Vt = V.transpose()
+	N = X.shape[0]
+	K = V.shape[0]
+	Xp = np.zeros((N,K))
+	for n in xrange(N):
+		# X[n,:] is (1 x D), V^T is (D x K) so X[n,:] . V^T is (1 x K)
+		Xp[n,:] = X[n,:].toarray().dot(Vt)
+	return Xp
+
