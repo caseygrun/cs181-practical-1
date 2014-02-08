@@ -8,9 +8,10 @@ def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
 
+
 def cov(X):
 	"""
-	X is (N x D)
+	Calculates the covariance matrix of X, if X is (N x D)
 	"""
 	N = X.shape[0]
 	D = X.shape[1]
@@ -22,7 +23,8 @@ def cov(X):
 	return S
 
 
-def analyze(X,K):
+
+def pca(X,K):
 	debug("Calculating covariance matrix...")
 	S = cov(X)
 
@@ -31,3 +33,22 @@ def analyze(X,K):
 
 	debug("Done.")
 	return (w, v)
+
+analyze = pca
+
+def svd(X,K):
+	"""
+	Accepts X (M x N) and calculates the first K singular values and singular
+	vectors by singular value decomposition. 
+
+	Returns: 
+	u : ndarray, shape=(M, k)
+		Unitary matrix having left singular vectors as columns.
+	s : ndarray, shape=(k,)
+		The singular values.
+	vt : ndarray, shape=(k, N)
+		Unitary matrix having right singular vectors as rows.
+	"""
+	debug("Calculating %d singular values by SVD...",(K,))
+	(u, s, vt) = scipy.sparse.linalg.svds(X, k=K, which='LM')
+	return (u, s, vt)
