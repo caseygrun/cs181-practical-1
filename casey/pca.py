@@ -1,3 +1,13 @@
+# ----------------------------------------------------------------------------
+# CS 181 | Practical 1 | Predictions
+# Casey Grun
+# 
+# pca.py
+# Does principal component analysis and singular value decomposition
+# 
+# ----------------------------------------------------------------------------
+
+
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg
@@ -25,6 +35,9 @@ def cov(X):
 
 
 def pca(X,K):
+	"""
+	Does principal components analysis on the sparse matrix X
+	"""
 	debug("Calculating covariance matrix...")
 	S = cov(X)
 
@@ -38,6 +51,8 @@ analyze = pca
 
 def svd(X,K):
 	"""
+	Does singular value decomposition on the sparse matrix X.
+
 	Accepts X (M x N) and calculates the first K singular values and singular
 	vectors by singular value decomposition. 
 
@@ -52,3 +67,11 @@ def svd(X,K):
 	debug("Calculating %d singular values by SVD...",(K,))
 	(u, s, vt) = scipy.sparse.linalg.svds(X, k=K, which='LM')
 	return (u, s, vt)
+
+def project(X,V):
+	"""
+	Projects the sparse matrix X on to the basis V.
+
+	X is (N x D) and V is (K x D)
+	"""
+	pass
