@@ -16,7 +16,7 @@ import util
 import kmeans
 import pca
 
-def build_ratings(filename="ratings_std"):
+def build_ratings(filename="ratings_std", standardize=True, format="lil"):
 	"""
 	Loads the training data for N users and D books, and builds an (N x D) 
 	array to store the ratings. Creates a dict with the following fields, and
@@ -56,34 +56,45 @@ def build_ratings(filename="ratings_std"):
 	train = util.load_train("../data/books/ratings-train.csv")
 
 
-	print "Standardizing ratings..."
 
 	# build up the sum of the values and the squared values of each rating, in order to calculate the mean and variance
 	T = len(train)
-	x = 0
-	x2 = 0
 	
-	for rating in train:
-		x += rating["rating"]
-		x2 += rating["rating"]**2
+	if(standardize):
+		print "Standardizing ratings..."
 
-	mean = x / T
-	var = (x2/T) - mean**2
-	std = math.sqrt(var)
+		x = 0
+		x2 = 0
+		
+		for rating in train:
+			x += rating["rating"]
+			x2 += rating["rating"]**2
 
-	print "Mean: %d , Variance: %d , Std. Dev: %d" % (mean, var, std)
+		mean = x / T
+		var = (x2/T) - mean**2
+		std = math.sqrt(var)
+		print "Mean: %d , Variance: %d , Std. Dev: %d" % (mean, var, std)
+
+	else:
+		mean = 0
+		var = 1
+		std = 1
+
 
 	print "Building ratings matrix..."
 	print "0 / %d" % T
 
 	# a sparse matrix to hold the ratings
-	ratings = sp.lil_matrix((N,D))
+	if format == "lil":
+		ratings = sp.lil_matrix((N,D))
 
-	for (i, rating) in enumerate(train):
-		ratings[ rating["user"]-1, book_isbn_to_index[rating["isbn"]] ] = (rating["rating"] - mean) / std
-		print "%d / %d" % (i, T)
+		for (i, rating) in enumerate(train):
+			ratings[ rating["user"]-1, book_isbn_to_index[rating["isbn"]] ] = (rating["rating"] - mean) / std
+			print "%d / %d" % (i, T)
+	elif format =="tuples":
+		ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], rating["rating"]) for rating in train]
 
-	kmeans.pickle({ "ratings": ratings, "book_isbn_to_index": book_isbn_to_index , "mean": mean, "variance": var},filename)
+	kmeans.pickle({ "ratings": ratings, "book_isbn_to_index": book_isbn_to_index , "mean": mean, "variance": var, "N": N, "D": D, "T": T},filename)
 
 def load_ratings(filename="output/ratings_std"):
 	"""

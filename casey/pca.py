@@ -11,6 +11,7 @@
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg
+import shared_utils as su
 
 DEBUG = True
 
@@ -93,4 +94,136 @@ def project2(X,V):
 		# X[n,:] is (1 x D), V^T is (D x K) so X[n,:] . V^T is (1 x K)
 		Xp[n,:] = X[n,:].toarray().dot(Vt)
 	return Xp
+
+
+
+def mfact(R, K, steps=5000, alpha=0.0002, beta=0.02):
+	"""
+	Adapted from Albert Au Yeung (2010)
+	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
+
+	Arguments:
+		R     : a matrix to be factorized, dimension N x D    
+		K     : the number of latent features
+		steps : the maximum number of steps to perform the optimisation
+		alpha : the learning rate
+		beta  : the regularization parameter
+
+	Returns:
+		P     : an initial matrix of dimension N x K
+		Q     : an initial matrix of dimension D x K
+	"""
+	N = R.shape[0]
+	D = R.shape[1]
+
+	P = np.random.rand(N,K)
+	Q = np.random.rand(D,K)
+	Q = Q.T
+
+	# Biases
+	Bu = np.zeros((N,1)) # N x 1
+	Bi = np.zeros((D,1)) # D x 1
+
+	# mean = ?? # calculate mean of R
+
+
+	debug("Starting Matrix Factorization into %d principal components...", (K,))
+
+	for step in xrange(steps):
+		for i in xrange(N):
+			for j in xrange(D):
+				if R[i,j] > 0:
+					eij = R[i,j] - np.dot(P[i,:],Q[:,j])
+					for k in xrange(K):
+						P[i][k] = P[i][k] + alpha * (2 * eij * Q[k][j] - beta * P[i][k])
+						Q[k][j] = Q[k][j] + alpha * (2 * eij * P[i][k] - beta * Q[k][j])
+		eR = np.dot(P,Q)
+		e = 0
+		for i in xrange(N):
+			for j in xrange(D):
+				if R[i,j] > 0:
+					e = e + pow(R[i][j] - np.dot(P[i,:],Q[:,j]), 2)
+					for k in xrange(K):
+						e = e + (beta/2) * ( pow(P[i][k],2) + pow(Q[k][j],2) )
+
+		debug("Step %d / %d: e = %d", (step, steps,e))
+		if e < 0.001:
+			break
+	return P, Q.T
+
+# steps=5000, alpha=0.0002, beta=0.02, epsilon=0.001, save_every=20
+def mfact2(R, N, D, K, steps=5000, alpha=0.001, beta=0.02, epsilon=0.001, save_every=20):
+	"""
+	Adapted from Albert Au Yeung (2010)
+	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
+
+	Arguments:
+		R     : a matrix to be factorized, dimension N x D    
+		K     : the number of latent features
+		steps : the maximum number of steps to perform the optimisation
+		alpha : the learning rate
+		beta  : the regularization parameter
+		epsilon : the minimum error (below which to quit)
+		save_every : save results after every `save_every` iterations
+
+	Returns:
+		P     : an initial matrix of dimension N x K
+		Q     : an initial matrix of dimension D x K
+	"""
+	
+	P = np.random.rand(N,K)
+	Q = np.random.rand(D,K)
+	Q = Q.T
+
+	# Biases
+	Bn = np.random.rand(N,1) # N x 1
+	Bd = np.random.rand(D,1) # D x 1
+
+	# Error
+	E = np.empty((N,D))
+
+	# calculate mean of R
+	debug("Calculating mean of R...")
+	mean = 1./len(R) * float(sum([ Rij for (i,j,Rij) in R ]))
+	debug("Mean: %d", (mean,))
+
+
+	debug("Starting Matrix Factorization into %d principal components...", (K,))
+
+	for step in xrange(steps):
+		for (i,j,Rij) in R:
+			if Rij > 0:
+				eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[:,j]))
+				P[i,:] = P[i,:] + alpha * (2 * eij * Q[:,j] - beta * P[i,:])
+				Q[:,j] = Q[:,j] + alpha * (2 * eij * P[i,:] - beta * Q[:,j])
+				Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
+				Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
+
+				# for k in xrange(K):
+				# 	P[i][k] = P[i][k] + alpha * (2 * eij * Q[k][j] - beta * P[i][k])
+				# 	Q[k][j] = Q[k][j] + alpha * (2 * eij * P[i][k] - beta * Q[k][j])
+		
+		# eR = np.dot(P,Q)
+		e = 0
+		for (i,j,Rij) in R:
+			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[:,j]))
+			e = e + pow(eij, 2)
+			
+			e = e + (beta/2) * sum(P[i,:]**2 + Q[:,j].T**2)
+
+			# for k in xrange(K):
+			# 	e = e + (beta/2) * ( pow(P[i][k],2) + pow(Q[k][j],2) )
+
+			# e = e + (beta/2) * (Bn[i]**2 + Bd[j]**2)
+
+		e = e + (beta/2) * (sum(Bn**2) + sum(Bd**2))
+
+		debug("Step %d / %d: e = %d", (step, steps,e))
+		if e < epsilon:
+			break
+
+		if (step % save_every) == 0:
+			su.pickle({"P":P, "Q":Q.T, "Bn":Bn, "Bd":Bd, "mean":mean},"output/mfact_%d_%d" % (K,step))
+
+	return {"P":P, "Q":Q.T, "Bn":Bn, "Bd":Bd, "mean":mean}
 
