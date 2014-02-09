@@ -2,7 +2,20 @@ import numpy as np
 #import scipy.misc.pilutil as smp
 from PIL import Image
 
-def draw_image(raw_data, file):
+def mins(list, n):
+    """given a list, returns the n smallest elements as a list of tuples (x, i)
+    where x is the value and is the index"""
+    #http://stackoverflow.com/questions/350519/getting-the-lesser-n-elements-of-a-list-in-python
+    mins = [(x, i) for (i, x) in enumerate(list[:n])]
+    mins.sort()
+    for (x, i) in (i, x) in enumerate(items[n:]):
+        if x < mins[-1]:
+            mins.append((x, i + n))
+            mins.sort()
+            mins = mins[:n]
+    return mins
+
+def save_image(raw_data, file):
     """Takes a list of 3072 values as described on the CIFAR page
     and outputs the corresponding image """
     #http://stackoverflow.com/questions/434583/what-is-the-fastest-way-to-draw-an-image-from-discrete-pixel-values-in-python
