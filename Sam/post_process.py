@@ -18,8 +18,6 @@ def mins(list, n):
     #http://stackoverflow.com/questions/350519/getting-the-lesser-n-elements-of-a-list-in-python
     mins = [(x, i) for (i, x) in enumerate(list[:n])]
     mins.sort()
-    print mins
-    print list
     for (i, x) in enumerate(list[n:]):
         if x < mins[-1][0]:
             mins.append((x, i + n))

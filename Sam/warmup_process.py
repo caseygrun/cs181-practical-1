@@ -16,13 +16,12 @@ ks = results['ks']
 us = results['us']
 objectives = results['objectives']
 
-"""print us
-visualize.im_show_grid(us*255)
+visualize.im_show_grid(us)
 
-x = np.array(range(len(objectives)))
+""""x = np.array(range(len(objectives)))
 y = np.array(objectives)
 plt.plot(x,y)
 plt.show()"""
 
-post.view_rep_images(data, us, dists,10)
+#post.view_rep_images(data, us, dists,10)
 
