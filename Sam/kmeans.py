@@ -20,6 +20,7 @@ def cluster_means(data, k, ks):
 
 def distances(data, us):
     """computes distance from each data point to every cluster mean"""
+    #NxK
     #return [[list_dist(x, y) for y in us] for x in data]
     diff = data[np.newaxis,:,:] - us[:,np.newaxis,:]
     dist = np.sum(diff**2,axis=-1)

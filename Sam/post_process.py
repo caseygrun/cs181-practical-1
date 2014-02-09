@@ -1,6 +1,16 @@
 import numpy as np
 #import scipy.misc.pilutil as smp
 from PIL import Image
+import visualize
+import kmeans
+
+def view_rep_images(data, us, dists, n):
+    min_images = []
+    for x in range(len(us)):
+        min_indices = [a[1] for a in mins(dists[:,x], n)]
+        min_images.append(data[min_indices])
+        visualize.im_show_grid(data[min_indices])
+    return min_images
 
 def mins(list, n):
     """given a list, returns the n smallest elements as a list of tuples (x, i)
@@ -8,8 +18,10 @@ def mins(list, n):
     #http://stackoverflow.com/questions/350519/getting-the-lesser-n-elements-of-a-list-in-python
     mins = [(x, i) for (i, x) in enumerate(list[:n])]
     mins.sort()
-    for (x, i) in (i, x) in enumerate(items[n:]):
-        if x < mins[-1]:
+    print mins
+    print list
+    for (i, x) in enumerate(list[n:]):
+        if x < mins[-1][0]:
             mins.append((x, i + n))
             mins.sort()
             mins = mins[:n]
@@ -17,7 +29,7 @@ def mins(list, n):
 
 def save_image(raw_data, file):
     """Takes a list of 3072 values as described on the CIFAR page
-    and outputs the corresponding image """
+    and saves the corresponding image """
     #http://stackoverflow.com/questions/434583/what-is-the-fastest-way-to-draw-an-image-from-discrete-pixel-values-in-python
     #http://stackoverflow.com/questions/10443295/combine-3-separate-numpy-arrays-to-an-rgb-image-in-python
     data = np.array(raw_data)

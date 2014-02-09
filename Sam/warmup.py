@@ -4,7 +4,7 @@ import kmeans
 import load_data as load
 import visualize
 import copy
-import shared_utils
+import shared_utils as utils
 
 data = load.load_CIFAR('data\warmup\cifar-10-batches-py\data_batch_1')
 
@@ -28,7 +28,7 @@ while True:
 us = kmeans.cluster_means(data, k, ks)
 objectives.append(kmeans.objective(data, ks, us))
 
-pickle({'ks': ks, 'us': us, 'objectives': objectives}, "output/ks")
+utils.pickle({'ks': ks, 'us': us, 'objectives': objectives}, "Sam/output/k10")
 """for (i,x) in enumerate(us):
     post.save_image(x, str(i))"""
 visualize.im_show_grid(us)
