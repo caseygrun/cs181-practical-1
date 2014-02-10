@@ -9,9 +9,11 @@
 
 
 import numpy as np
+import numpy.linalg as la
 import scipy.sparse as sp
 import scipy.sparse.linalg
 import shared_utils as su
+import time
 
 DEBUG = True
 
@@ -152,78 +154,81 @@ def mfact(R, K, steps=5000, alpha=0.0002, beta=0.02):
 	return P, Q.T
 
 # steps=5000, alpha=0.0002, beta=0.02, epsilon=0.001, save_every=20
-def mfact2(R, N, D, K, steps=5000, alpha=0.001, beta=0.02, epsilon=0.001, save_every=20):
+def mfact2(R, N, D, K, steps=5000, alpha=0.01, beta=0.02, epsilon=0.001, save_every=20):
 	"""
 	Adapted from Albert Au Yeung (2010)
 	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
 
 	Arguments:
-		R     : a matrix to be factorized, dimension N x D    
-		K     : the number of latent features
-		steps : the maximum number of steps to perform the optimisation
-		alpha : the learning rate
-		beta  : the regularization parameter
-		epsilon : the minimum error (below which to quit)
-		save_every : save results after every `save_every` iterations
+		R       	: a matrix to be factorized, dimension N x D (initial ratings)    
+		K       	: the number of latent features
+		steps   	: the maximum number of steps to perform the optimisation
+		alpha   	: the learning rate
+		beta    	: the regularization parameter
+		epsilon 	: the minimum error (below which to quit)
+		save_every	: save results after every `save_every` iterations
 
-	Returns:
-		P     : an initial matrix of dimension N x K
-		Q     : an initial matrix of dimension D x K
+	Returns: a dict with the following keys:
+		"P"     	: an array (N x K) containing user features
+		"Q"     	: an array (D x K) containing book features
+		"Bn"    	: an array (N x 1) containing user biases
+		"Bd"    	: an array (D x 1) containing book biases
+		"mean"  	: the global mean of the initial rankings
 	"""
 	
+	# initialize random user and book feature matrices
 	P = np.random.rand(N,K)
 	Q = np.random.rand(D,K)
-	Q = Q.T
 
-	# Biases
+	# initialize random bias vectors
 	Bn = np.random.rand(N,1) # N x 1
 	Bd = np.random.rand(D,1) # D x 1
 
 	# Error
-	E = np.empty((N,D))
+	# E = np.empty((N,D))
 
 	# calculate mean of R
 	debug("Calculating mean of R...")
 	mean = 1./len(R) * float(sum([ Rij for (i,j,Rij) in R ]))
 	debug("Mean: %d", (mean,))
 
-
+	t = time.clock()
 	debug("Starting Matrix Factorization into %d principal components...", (K,))
 
+	# for each step (epoch)
 	for step in xrange(steps):
-		for (i,j,Rij) in R:
-			if Rij > 0:
-				eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[:,j]))
-				P[i,:] = P[i,:] + alpha * (2 * eij * Q[:,j] - beta * P[i,:])
-				Q[:,j] = Q[:,j] + alpha * (2 * eij * P[i,:] - beta * Q[:,j])
-				Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
-				Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
-
-				# for k in xrange(K):
-				# 	P[i][k] = P[i][k] + alpha * (2 * eij * Q[k][j] - beta * P[i][k])
-				# 	Q[k][j] = Q[k][j] + alpha * (2 * eij * P[i][k] - beta * Q[k][j])
 		
-		# eR = np.dot(P,Q)
+		# calculate the total error, e
 		e = 0
 		for (i,j,Rij) in R:
-			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[:,j]))
-			e = e + pow(eij, 2)
-			
-			e = e + (beta/2) * sum(P[i,:]**2 + Q[:,j].T**2)
+			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
+			e += pow(eij, 2)
 
-			# for k in xrange(K):
-			# 	e = e + (beta/2) * ( pow(P[i][k],2) + pow(Q[k][j],2) )
+		e = e + (beta/2) * (sum(Bn**2) + sum(Bd**2)) + la.norm(P) + la.norm(Q)
 
-			# e = e + (beta/2) * (Bn[i]**2 + Bd[j]**2)
+		# report error and timing
+		tp = time.clock()
+		debug("Step %000d / %000d (%d): e = %d", (step, steps, tp-t, e))
+		t = tp
 
-		e = e + (beta/2) * (sum(Bn**2) + sum(Bd**2))
-
-		debug("Step %d / %d: e = %d", (step, steps,e))
+		# break if error is small enough
 		if e < epsilon:
 			break
 
+		# periodically save results
 		if (step % save_every) == 0:
-			su.pickle({"P":P, "Q":Q.T, "Bn":Bn, "Bd":Bd, "mean":mean},"output/mfact_%d_%d" % (K,step))
+			su.pickle({"P":P, "Q":Q, "Bn":Bn, "Bd":Bd, "mean":mean},"output/mfact_%d_%d" % (K,step))
 
-	return {"P":P, "Q":Q.T, "Bn":Bn, "Bd":Bd, "mean":mean}
+		# update P, Q, Bn, and Bd by gradient descent
+		for (i,j,Rij) in R:
+			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
+			# eij = E[i,j]
+			P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+			Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+			Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
+			Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
+
+
+	# return results
+	return {"P":P, "Q":Q, "Bn":Bn, "Bd":Bd, "mean":mean}
 

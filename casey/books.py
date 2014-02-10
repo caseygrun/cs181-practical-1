@@ -92,7 +92,10 @@ def build_ratings(filename="ratings_std", standardize=True, format="lil"):
 			ratings[ rating["user"]-1, book_isbn_to_index[rating["isbn"]] ] = (rating["rating"] - mean) / std
 			print "%d / %d" % (i, T)
 	elif format =="tuples":
-		ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], rating["rating"]) for rating in train]
+		if standardize=='t':
+			ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], (rating["rating"]-1)/4) for rating in train]
+		else:
+			ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], rating["rating"]) for rating in train]
 
 	kmeans.pickle({ "ratings": ratings, "book_isbn_to_index": book_isbn_to_index , "mean": mean, "variance": var, "N": N, "D": D, "T": T},filename)
 

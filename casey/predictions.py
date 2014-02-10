@@ -105,7 +105,7 @@ su.pickle(mfact,"output/mfact_%d" % K)
 sys.exit(0)
 
 # do prediction based on matrix factorization
-K = 15
+K = 20
 run = 0
 step = 20
 mfact = su.unpickle("output/mfact_%d_run_%d/mfact_%d_%d" % (K, run, K, step))
