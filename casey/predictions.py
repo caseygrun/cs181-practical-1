@@ -8,6 +8,7 @@
 # ----------------------------------------------------------------------------
 
 import sys
+import math
 import numpy as np
 import books
 import kmeans
@@ -16,7 +17,10 @@ import visualize
 import util
 import shared_utils as su
 
+# # build ratings
+# books.build_ratings(filename="output/ratings_std",standardize=True)
 # books.build_ratings(filename="output/ratings_tuples",standardize=False,format="tuples")
+# books.build_ratings(filename="output/ratings_tuples_linear",standardize='linear',format="tuples")
 # sys.exit(0)
 # (ratings, book_isbn_to_index) = books.load_ratings()
 # ratings = ratings.tocsr()
@@ -92,42 +96,21 @@ import shared_utils as su
 # sys.exit(0)
 
 # load training data
-d = su.unpickle("output/ratings_tuples")
+d = su.unpickle("output/ratings_tuples_linear")
 ratings = d["ratings"]
 N = d["N"]
 D = d["D"]
 book_isbn_to_index = d["book_isbn_to_index"]
+mean = d["mean"]
+std = math.sqrt(d["var"])
 
-# # do matrix factorization
-K = 20
+# do matrix factorization
+K = 30
 mfact = pca.mfact2(ratings,N,D,K)
-su.pickle(mfact,"output/mfact_%d" % K)
+# su.pickle(mfact,"output/mfact_%d" % K)
 sys.exit(0)
 
-# do prediction based on matrix factorization
-K = 20
-run = 0
-step = 20
-mfact = su.unpickle("output/mfact_%d_run_%d/mfact_%d_%d" % (K, run, K, step))
-P = mfact["P"]
-Q = mfact["Q"]
-Bn = mfact["Bn"]
-Bd = mfact["Bd"]
-mean = mfact["mean"]
-
-queries = util.load_test("../data/books/ratings-test.csv")
-L = len(queries)
-for (i,query) in enumerate(queries):
-	print ("%d / %d" % (i,L)),
-	user_index = query["user"] - 1
-	book_index = book_isbn_to_index[query["isbn"]]
-	# calculate rating
-	rating = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index])
-	# coerce to range (1,5)
-	rating = max(1,min(5,rating))
-	# convert to int
-	rating = int(round(rating))
-	query["rating"] = rating
-	print query
-
-util.write_predictions(queries, "output/mfact_%d_run_%d/predictions.csv" % (K,run))
+# copy all the generated mfact_%d files into a subdirectory output/mfact_K_run_R,
+# replacing K with the value for K above, and R with the number of times you've
+# run the script for that K. 
+# then use predictions2.py to calculate the real predictions
