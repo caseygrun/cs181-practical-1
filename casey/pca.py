@@ -160,7 +160,9 @@ def mfact2(R, N, D, K, steps=5000, alpha=0.01, beta=0.02, epsilon=0.001, save_ev
 	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
 
 	Arguments:
-		R       	: a matrix to be factorized, dimension N x D (initial ratings)    
+		R       	: the set of known ratings, given as a list of tuples 
+					(i, j, r) where i is the index of the user, j is the index 
+					of the book, and r is the rating
 		K       	: the number of latent features
 		steps   	: the maximum number of steps to perform the optimisation
 		alpha   	: the learning rate
@@ -190,7 +192,7 @@ def mfact2(R, N, D, K, steps=5000, alpha=0.01, beta=0.02, epsilon=0.001, save_ev
 	# calculate mean of R
 	debug("Calculating mean of R...")
 	mean = 1./len(R) * float(sum([ Rij for (i,j,Rij) in R ]))
-	debug("Mean: %d", (mean,))
+	debug("Mean: %f", (mean,))
 
 	t = time.clock()
 	debug("Starting Matrix Factorization into %d principal components...", (K,))

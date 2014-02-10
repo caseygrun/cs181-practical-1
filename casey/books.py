@@ -12,6 +12,7 @@ import sys
 import math
 import numpy as np
 import scipy.sparse as sp
+import shared_utils as su
 import util
 import kmeans
 import pca
@@ -19,7 +20,22 @@ import pca
 def build_ratings(filename="ratings_std", standardize=True, format="lil"):
 	"""
 	Loads the training data for N users and D books, and builds an (N x D) 
-	array to store the ratings. Creates a dict with the following fields, and
+	array to store the ratings. 
+
+	Arguments:
+
+		filename	: File name to save the data to
+		standardize	: one of:
+			-	True	: standardize the data by subtracting the mean and 
+			dividing by the standard deviation
+			-	'linear': standardize by subtracting 1 and dividing by 4
+			-	False	: do not standardize
+		format   	: one of:
+			-	"lil"	: encode the ratings as a scipy.sparse.lil_matrix
+			-	"tuple"	: encode the ratings as a list of tuples (i, j, r)
+			where i is the user index, j is the book index, and r is the rating
+
+	Returns: a dict with the following fields, and
 	pickles it to the given `filename`. 
 
 		*	`ratings` : (N x D) matrix of ratings. Ratings are standardized to
@@ -60,7 +76,7 @@ def build_ratings(filename="ratings_std", standardize=True, format="lil"):
 	# build up the sum of the values and the squared values of each rating, in order to calculate the mean and variance
 	T = len(train)
 	
-	if(standardize):
+	if(standardize == True):
 		print "Standardizing ratings..."
 
 		x = 0
@@ -74,7 +90,10 @@ def build_ratings(filename="ratings_std", standardize=True, format="lil"):
 		var = (x2/T) - mean**2
 		std = math.sqrt(var)
 		print "Mean: %d , Variance: %d , Std. Dev: %d" % (mean, var, std)
-
+	elif (standardize == 'linear'):
+		mean = 1
+		std = 4.
+		var = 2.
 	else:
 		mean = 0
 		var = 1
@@ -92,12 +111,10 @@ def build_ratings(filename="ratings_std", standardize=True, format="lil"):
 			ratings[ rating["user"]-1, book_isbn_to_index[rating["isbn"]] ] = (rating["rating"] - mean) / std
 			print "%d / %d" % (i, T)
 	elif format =="tuples":
-		if standardize=='t':
-			ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], (rating["rating"]-1)/4) for rating in train]
-		else:
-			ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], rating["rating"]) for rating in train]
+		ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], (rating["rating"] - mean) / std) for rating in train]
 
-	kmeans.pickle({ "ratings": ratings, "book_isbn_to_index": book_isbn_to_index , "mean": mean, "variance": var, "N": N, "D": D, "T": T},filename)
+	print ratings
+	su.pickle({ "ratings": ratings, "book_isbn_to_index": book_isbn_to_index , "mean": mean, "variance": var, "N": N, "D": D, "T": T},filename)
 
 def load_ratings(filename="output/ratings_std"):
 	"""
@@ -105,6 +122,6 @@ def load_ratings(filename="output/ratings_std"):
 	where `ratings` and `book_isbn_to_index` are described in the 
 	`build_ratings` function.
 	"""
-	d = kmeans.unpickle(filename)
+	d = su.unpickle(filename)
 	return (d["ratings"], d["book_isbn_to_index"])
 
