@@ -1,56 +1,36 @@
-def stoch_grad_desc(rs, f, qs, ps):
-    
+import numpy as np
+import util
 
-def mfact(R, K, steps=5000, alpha=0.0002, beta=0.02):
-    """
-    Adapted from Albert Au Yeung (2010)
-    http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
+def stoch_grad_desc(rs, f, qs, ps, a, b):
+    for (p,q,r) in rs:
+        e = r - np.dot(qs[q],ps[p])
+        qs[q] += a * (e * ps[p] - b * qs[q])
+        ps[q] += a * (e * qs[p] - b * ps[q])
 
-    Arguments:
-        R     : a matrix to be factorized, dimension N x D
-        K     : the number of latent features
-        steps : the maximum number of steps to perform the optimisation
-        alpha : the learning rate
-        beta  : the regularization parameter
+def init_ratings():
+    return
 
-    Returns:
-        P     : an initial matrix of dimension N x K
-        Q     : an initial matrix of dimension D x K
-    """
-    N = R.shape[0]
-    D = R.shape[1]
+def book_biases():
+    train_filename = 'ratings-train.csv'
+    book_filename  = 'books.csv'
 
-    P = np.random.rand(N,K)
-    Q = np.random.rand(D,K)
-    Q = Q.T
+    training_data  = util.load_train(train_filename)
+    book_list      = util.load_books(book_filename)
 
-    # Biases
-    Bu = np.zeros((N,1)) # N x 1
-    Bi = np.zeros((D,1)) # D x 1
+    books = {}
+    for book in book_list:
+        books[book['isbn']] = { 'total': 0, # For storing the total of ratings.
+                            'count': 0, # For storing the number of ratings.
+                            }
 
-    # mean = ?? # calculate mean of R
+    # Iterate over the training data to compute means.
+    for rating in training_data:
+        books[rating['isbn']]['total'] += rating['rating']
+        books[rating['isbn']]['count'] += 1
 
+    bBooks = np.zeros(len(book_list))
 
-    debug("Starting Matrix Factorization into %d principal components...", (K,))
-
-    for step in xrange(steps):
-        for i in xrange(N):
-            for j in xrange(D):
-                if R[i,j] > 0:
-                    eij = R[i,j] - np.dot(P[i,:],Q[:,j])
-                    for k in xrange(K):
-                        P[i][k] = P[i][k] + alpha * (2 * eij * Q[k][j] - beta * P[i][k])
-                        Q[k][j] = Q[k][j] + alpha * (2 * eij * P[i][k] - beta * Q[k][j])
-        eR = np.dot(P,Q)
-        e = 0
-        for i in xrange(N):
-            for j in xrange(D):
-                if R[i,j] > 0:
-                    e = e + pow(R[i][j] - np.dot(P[i,:],Q[:,j]), 2)
-                    for k in xrange(K):
-                        e = e + (beta/2) * ( pow(P[i][k],2) + pow(Q[k][j],2) )
-
-        debug("Step %d / %d: e = %d", (step, steps,e))
-        if e < 0.001:
-            break
-    return P, Q.T
+    for book in book_list:
+        isbn = book['isbn']
+        bBooks[isbnIndex[isbn]] = float(book['total']) / book['count']
+    float(book['total']) / book['count']
