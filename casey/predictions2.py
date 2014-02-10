@@ -18,7 +18,7 @@ import util
 import shared_utils as su
 
 # load training data
-d = su.unpickle("output/ratings_tuples")
+d = su.unpickle("output/ratings_tuples_linear")
 ratings = d["ratings"]
 N = d["N"]
 D = d["D"]
@@ -26,13 +26,13 @@ book_isbn_to_index = d["book_isbn_to_index"]
 # this is the mean of the un-standardized training data, used to un-standardize
 # the data at the end
 mean = d["mean"]
-var = d["var"]
+var = d["variance"]
 std = math.sqrt(var)
 
 # do prediction based on matrix factorization
-K = 20
-run = 2
-step = 260
+K = 30
+run = 0
+step = 280
 mfact = su.unpickle("output/mfact_%d_run_%d/mfact_%d_%d" % (K, run, K, step))
 P = mfact["P"]
 Q = mfact["Q"]
@@ -69,23 +69,23 @@ util.write_predictions(queries, "output/mfact_%d_run_%d/predictions.csv" % (K,ru
 # ----------------------------------------------------------------------------
 
 # # visualize distribution of ratings
-# queries = su.unpickle("output/mfact_%d_run_%d/predictions" % (K,run))
+K = 30
+run = 0
+step = 280
+queries = su.unpickle("output/mfact_%d_run_%d/predictions" % (K,run))
 
-# ratings = []
-# ratings_f = []
-# for query in queries:
-# 	ratings.append(query["rating"])
-# 	ratings_f.append(float(query["rating_f"]))
+ratings = []
+ratings_f = []
+for query in queries:
+	ratings.append(query["rating"])
+	ratings_f.append(float(query["rating_f"]))
 
-# # print ratings_f
-# # sys.exit(0)
+print np.mean(ratings), np.var(ratings)
+print np.mean(ratings_f), np.var(ratings_f)
 
-# print np.mean(ratings), np.var(ratings)
-# print np.mean(ratings_f), np.var(ratings_f)
-
-# import matplotlib.pyplot as plt
-# plt.subplot(1,2,1)
-# plt.hist(ratings,5)
-# plt.subplot(1,2,2)
-# plt.hist(ratings_f,20)
-# plt.show()
+import matplotlib.pyplot as plt
+plt.subplot(1,2,1)
+plt.hist(ratings,5)
+plt.subplot(1,2,2)
+plt.hist(ratings_f,20)
+plt.show()
