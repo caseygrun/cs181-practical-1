@@ -37,8 +37,10 @@ def rmse_withheld(trainData, ratings_data, mfact_data):
 
 	for (i,j,r) in ratings_data['ratings']:
 		#predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
-			#* scale + center
-		predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
+		#	* scale + center
+		predictedR = (np.dot(P[i,:],Q[j,:]) + mean) \
+			* scale + center
+		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		error += (r - predictedR)**2
 		print r, predictedR
 
@@ -103,6 +105,20 @@ def make_predictions(ratings_data, mfact_data):
 		# if DEBUG: print "%f -> %d" % (rating_float, rating)
 
 	return queries
+
+def user_mean(data):
+	ratings = data['ratings']
+
+	N = data['N']
+	userTotal = np.zeros(N)
+	userCount = np.zeros(N)
+
+	for (i,j,r) in ratings:
+		userTotal[i] += r
+		userCount[i] += 1.0
+
+	return userTotal / userCount
+
 
 def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple", withhold=20000):
 	"""

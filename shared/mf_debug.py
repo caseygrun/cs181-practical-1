@@ -47,8 +47,8 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
 
     # initialize random user and book feature matrices
     P = np.random.rand(N,K)
-    #Q = np.random.rand(D,K)
-    Q = np.ones((D,K))
+    Q = np.random.rand(D,K)
+    #Q = np.ones((D,K))
 
     # initialize random bias vectors
     #Bn = np.random.rand(N,1) # N x 1
@@ -83,10 +83,11 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
         e = 0
         for (i,j,Rij) in R:
             #eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
-            eij = Rij - np.sum(P[i,:])
+            eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
             e += pow(eij, 2)
 
         #e = e + (beta/2) * (sum(Bn**2) + sum(Bd**2) + la.norm(P) + la.norm(Q))
+        e = e + (beta/2) * (la.norm(P) + la.norm(Q))
         de = ep - e
 
         # report error and timing
@@ -103,6 +104,7 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
         if (step % save_every) == 0:
             su.pickle(results(),filename + "_%d" % step)
 
+
         # update P, Q, Bn, and Bd by gradient descent
         for (i,j,Rij) in R:
             """eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
@@ -110,8 +112,9 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
             Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
             Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i])
             Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j])"""
-            eij = Rij - np.sum(P[i,:])
-            P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:])
+            eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
+            P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+            Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
 
     if step == steps-1:
         print "Gave up after %d steps with delta-error = %d" % (step+1, de)
