@@ -33,6 +33,6 @@ data_mfact = mf_debug.mfact(data_train["ratings"], data_train["N"], data_train["
 data_withheld = su.unpickle("ratings_tuple_std_withheld")
 #data_mfact = su.unpickle("debug_data/mfact_1_run_0_200")
 
-rmse = books.rmse_withheld(data_withheld, data_mfact)
+rmse = books.rmse_withheld(data_train, data_withheld, data_mfact)
 
 print rmse
