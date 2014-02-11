@@ -20,6 +20,48 @@ DEBUG = True
 def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
+def cross_validate(train_data, withheld_data, mfact_data):
+	"""
+	Takes a factorization produced from a set of training data, and calculates 
+	the RMSE with a set of withheld data.
+
+	Arguments:
+		train_data   	: data object from the training data
+		withheld_data	: data object from the withheld data
+		mfact_data   	: data object from mfact
+
+	Returns:
+		error			: RMSE between predicted ratings and actual ratings
+						from the withheld data
+	"""
+
+	# load data from the original training set
+	center = train_data["center"]
+	scale = train_data["scale"]
+	book_isbn_to_index = train_data["book_isbn_to_index"]
+
+	# load data calculated by the matrix factorization
+	P = mfact_data["P"]
+	Q = mfact_data["Q"]
+	Bn = mfact_data["Bn"]
+	Bd = mfact_data["Bd"]
+	mean = mfact_data["mean"]
+
+	# sum squared error
+	error = 0.0
+	for (i,j,r) in withheld_data['ratings']:
+		predictedR = np.dot(P[i,:],Q[j,:]) * train_data['scale'] + train_data['mean']
+		error += (r - predictedR)**2
+		print r, predictedR
+
+	# calculate mean square error
+	error /= len(withheld_data['ratings'])
+
+	# calculate root mean square error
+	error = math.sqrt(error)
+
+	return error
+
 def rmse_withheld(ratings_data, mfact_data):
 	# load data from the original training set
 	center = ratings_data["center"]
@@ -40,7 +82,7 @@ def rmse_withheld(ratings_data, mfact_data):
 			#* scale + center
 		predictedR = np.dot(P[i,:],Q[j,:]) * math.sqrt(ratings_data['variance']) + ratings_data['mean']
 		error += (r - predictedR)**2
-		print r, predictedR
+		# print r, predictedR
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
