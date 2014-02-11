@@ -2,15 +2,15 @@
 # ----------------------------------------------------------------------------
 # CS 181 | Practical 1 | Predictions
 # Casey Grun, Rhed Shi, Sam Kim
-# 
+#
 # shared_utils.py
 # Contains shared utility functions for unsupervised learning
-# 
-# to link this file into your directory, just do this (from the /shared 
+#
+# to link this file into your directory, just do this (from the /shared
 # directory):
-# 
+#
 # ln -s shared_utils.py ../YOURNAME/shared_utils.py
-# 
+#
 # ----------------------------------------------------------------------------
 
 import numpy as np
@@ -36,12 +36,12 @@ def unpickle(file):
 
 def pickle(array, file):
 	"""
-	Dumps an array to a file. 
+	Dumps an array to a file.
 
 	Example usage:
 
 		pickle(U, 'output/U_20_std')
-		
+
 	"""
 	import cPickle
 	fo = open(file,'wb')
@@ -51,8 +51,8 @@ def pickle(array, file):
 # calculate cartesian distances
 def dist(x,u):
 	"""
-	Given an (n x d) array X, a (k x d) array U, returns a (k x n) array D 
-	giving the cartesian distances between each row of X and each row of U. 
+	Given an (n x d) array X, a (k x d) array U, returns a (k x n) array D
+	giving the cartesian distances between each row of X and each row of U.
 	That is, D[i,j] = distance(U[i,:], X[j,:])
 	"""
 	# https://github.com/dwf/rescued-scipy-wiki/blob/master/EricsBroadcastingDoc.rst
@@ -62,12 +62,12 @@ def dist(x,u):
 
 def dist2(x,u):
 	"""
-	Given an (n x d) array X, a (k x d) array U, returns a (k x n) array D 
-	giving the cartesian distances between each row of X and each row of U. 
+	Given an (n x d) array X, a (k x d) array U, returns a (k x n) array D
+	giving the cartesian distances between each row of X and each row of U.
 	That is, D[i,j] = distance(U[i,:], X[j,:]). This function does not use
 	broadcasing.
 	"""
-	N = x.shape[0]; D = x.shape[1]; K = u.shape[0] 
+	N = x.shape[0]; D = x.shape[1]; K = u.shape[0]
 	dist = np.zeros((K,N))
 	for i in xrange(N):
 		diff = u - x[i,:].toarray()
@@ -83,9 +83,6 @@ def roll(U,R):
 	R = np.roll(R,1,axis=1)
 	return (U,R)
 
-
-
-
 # inverse transform sampling
 # http://stackoverflow.com/questions/4113307/pythonic-way-to-select-list-elements-with-different-probability
 
@@ -97,7 +94,7 @@ def cdf(weights):
 
 def choice(population,weights):
 	"""
-	Choose from a population with the corresponding weights. Uses inverse 
+	Choose from a population with the corresponding weights. Uses inverse
 	transform sampling (universality of the uniform) to sample from the
 	empirical CDF.
 	"""
