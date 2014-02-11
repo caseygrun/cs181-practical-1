@@ -42,7 +42,6 @@ def rmse_withheld(trainData, ratings_data, mfact_data):
 			* scale + center
 		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		error += (r - predictedR)**2
-		print r, predictedR
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
