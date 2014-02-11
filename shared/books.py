@@ -20,6 +20,32 @@ DEBUG = True
 def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
+def rmse_withheld(ratings_data, mfact_data):
+	# load data from the original training set
+	center = ratings_data["center"]
+	scale = ratings_data["scale"]
+	book_isbn_to_index = ratings_data["book_isbn_to_index"]
+
+	# load data calculated by the matrix factorization
+	P = mfact_data["P"]
+	Q = mfact_data["Q"]
+	Bn = mfact_data["Bn"]
+	Bd = mfact_data["Bd"]
+	mean = mfact_data["mean"]
+
+	error = 0
+
+	for (i,j,r) in ratings_data['ratings']:
+		predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
+			* scale + center
+		error += (r - predictedR)**2
+
+	error /= len(ratings_data['ratings'])
+	error = math.sqrt(error)
+
+	return error
+
+
 def make_predictions(ratings_data, mfact_data):
 	"""
 	Makes a set of predictions, suitable for passing to util.write_predictions

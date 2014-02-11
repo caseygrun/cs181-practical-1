@@ -9,7 +9,7 @@ import shared_utils as su
 
 
 # do this once to build the ratings and save them to ratings_tuple_std
-books.build_ratings(filename="ratings_tuple_std", standardize=True, withhold=20000)
+books.build_ratings(filename="ratings_tuple_std", standardize=True, withhold=0)
 
 # load training data
 data_train = su.unpickle("ratings_tuple_std")

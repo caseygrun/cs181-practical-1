@@ -112,9 +112,7 @@ def standardize(data):
     std  = data.std(axis=0)
     return (data - mean)/std
 
-def rmse(data, predictions):
-	"""
-	"""
+"""def rmse(data, predictions):
 	return math.sqrt(sum((data-predict)**2)/len(data))
 
 def prediction_rmse(predictions, dataFile):
@@ -132,4 +130,4 @@ def prediction_rmse(predictions, dataFile):
 		else:
 			print "ERROR"
 
-	return rmse(ratingList, predictList)
+	return rmse(ratingList, predictList)"""
