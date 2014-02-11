@@ -33,12 +33,14 @@ def rmse_withheld(ratings_data, mfact_data):
 	Bd = mfact_data["Bd"]
 	mean = mfact_data["mean"]
 
-	error = 0
+	error = 0.0
 
 	for (i,j,r) in ratings_data['ratings']:
-		predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
-			* scale + center
+		#predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
+			#* scale + center
+		predictedR = np.dot(P[i,:],Q[j,:]) * math.sqrt(ratings_data['variance']) + ratings_data['mean']
 		error += (r - predictedR)**2
+		print r, predictedR
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
@@ -271,6 +273,7 @@ def standardize_ratings(data, mode=True):
 	x = 0.0
 	x2 = 0.0
 
+	# calculate mean and variance
 	for (i,j,Rij) in data["ratings"]:
 		x += Rij
 		x2 += Rij**2
@@ -290,14 +293,14 @@ def standardize_ratings(data, mode=True):
 	elif (mode == 'linear'):
 
 		print "Standardizing ratings to the interval [0,1]..."
-		center = 1
-		scale = 4
+		center = 1.0
+		scale = 4.0
 
 	else:
 
 		print "No standardization applied to ratings."
-		center = 0
-		scale = 4
+		center = 0.0
+		scale = 1.0
 
 	data["ratings"] = [ (i, j, (Rij - center)/scale) for (i, j, Rij) in data["ratings"]]
 	data["center"] = center

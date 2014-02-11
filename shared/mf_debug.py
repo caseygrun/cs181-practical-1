@@ -54,7 +54,7 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
     #Bn = np.random.rand(N,1) # N x 1
     #Bd = np.random.rand(D,1) # D x 1
     Bn = np.zeros((N,1))
-    Bd = np.zeros((N,1))
+    Bd = np.zeros((D,1))
 
     # initialize total error
     e = 0
