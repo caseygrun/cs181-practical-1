@@ -20,7 +20,7 @@ DEBUG = True
 def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
-def cross_validate(train_data, withheld_data, mfact_data):
+def rmse_withheld(trainData, ratings_data, mfact_data):
 	"""
 	Takes a factorization produced from a set of training data, and calculates 
 	the RMSE with a set of withheld data.
@@ -34,39 +34,10 @@ def cross_validate(train_data, withheld_data, mfact_data):
 		error			: RMSE between predicted ratings and actual ratings
 						from the withheld data
 	"""
-
 	# load data from the original training set
-	center = train_data["center"]
-	scale = train_data["scale"]
-	book_isbn_to_index = train_data["book_isbn_to_index"]
-
-	# load data calculated by the matrix factorization
-	P = mfact_data["P"]
-	Q = mfact_data["Q"]
-	Bn = mfact_data["Bn"]
-	Bd = mfact_data["Bd"]
-	mean = mfact_data["mean"]
-
-	# sum squared error
-	error = 0.0
-	for (i,j,r) in withheld_data['ratings']:
-		predictedR = np.dot(P[i,:],Q[j,:]) * train_data['scale'] + train_data['mean']
-		error += (r - predictedR)**2
-		print r, predictedR
-
-	# calculate mean square error
-	error /= len(withheld_data['ratings'])
-
-	# calculate root mean square error
-	error = math.sqrt(error)
-
-	return error
-
-def rmse_withheld(ratings_data, mfact_data):
-	# load data from the original training set
-	center = ratings_data["center"]
-	scale = ratings_data["scale"]
-	book_isbn_to_index = ratings_data["book_isbn_to_index"]
+	center = trainData["center"]
+	scale = trainData["scale"]
+	book_isbn_to_index = trainData["book_isbn_to_index"]
 
 	# load data calculated by the matrix factorization
 	P = mfact_data["P"]
@@ -79,8 +50,10 @@ def rmse_withheld(ratings_data, mfact_data):
 
 	for (i,j,r) in ratings_data['ratings']:
 		#predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
-			#* scale + center
-		predictedR = np.dot(P[i,:],Q[j,:]) * math.sqrt(ratings_data['variance']) + ratings_data['mean']
+		#	* scale + center
+		predictedR = (np.dot(P[i,:],Q[j,:]) + mean) \
+			* scale + center
+		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		error += (r - predictedR)**2
 		# print r, predictedR
 
@@ -145,6 +118,20 @@ def make_predictions(ratings_data, mfact_data):
 		# if DEBUG: print "%f -> %d" % (rating_float, rating)
 
 	return queries
+
+def user_mean(data):
+	ratings = data['ratings']
+
+	N = data['N']
+	userTotal = np.zeros(N)
+	userCount = np.zeros(N)
+
+	for (i,j,r) in ratings:
+		userTotal[i] += r
+		userCount[i] += 1.0
+
+	return userTotal / userCount
+
 
 def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple", withhold=20000):
 	"""
