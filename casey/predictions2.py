@@ -17,30 +17,30 @@ import visualize
 import util
 import shared_utils as su
 
-# load training data
-d = su.unpickle("output/ratings_tuples_linear")
-ratings = d["ratings"]
-N = d["N"]
-D = d["D"]
-book_isbn_to_index = d["book_isbn_to_index"]
-# this is the mean of the un-standardized training data, used to un-standardize
-# the data at the end
-mean = d["mean"]
-var = d["variance"]
-std = math.sqrt(var)
+# # load training data
+# d = su.unpickle("output/ratings_tuples_linear")
+# ratings = d["ratings"]
+# N = d["N"]
+# D = d["D"]
+# book_isbn_to_index = d["book_isbn_to_index"]
+# # this is the mean of the un-standardized training data, used to un-standardize
+# # the data at the end
+# mean = d["mean"]
+# var = d["variance"]
+# std = math.sqrt(var)
 
-# do prediction based on matrix factorization
-K = 30
-run = 0
-step = 280
-mfact = su.unpickle("output/mfact_%d_run_%d/mfact_%d_%d" % (K, run, K, step))
-P = mfact["P"]
-Q = mfact["Q"]
-Bn = mfact["Bn"]
-Bd = mfact["Bd"]
-# this is the mean of the standardized training data, used for the learning/
-# prediction
-standard_mean = mfact["mean"] 
+# # do prediction based on matrix factorization
+# K = 30
+# run = 0
+# step = 280
+# mfact = su.unpickle("output/mfact_%d_run_%d/mfact_%d_%d" % (K, run, K, step))
+# P = mfact["P"]
+# Q = mfact["Q"]
+# Bn = mfact["Bn"]
+# Bd = mfact["Bd"]
+# # this is the mean of the standardized training data, used for the learning/
+# # prediction
+# standard_mean = mfact["mean"] 
 
 # load the set of requested predictions
 queries = util.load_test("../data/books/ratings-test.csv")
@@ -63,15 +63,28 @@ for (i,query) in enumerate(queries):
 	query["rating_f"] = rating_float
 	print "%f -> %d" % (rating_float, rating)
 
-su.pickle(queries,"output/mfact_%d_run_%d/predictions" % (K,run))
-util.write_predictions(queries, "output/mfact_%d_run_%d/predictions.csv" % (K,run))
+# su.pickle(queries,"output/mfact_%d_run_%d/predictions" % (K,run))
+# util.write_predictions(queries, "output/mfact_%d_run_%d/predictions.csv" % (K,run))
 
 # ----------------------------------------------------------------------------
 
-# # visualize distribution of ratings
-K = 30
-run = 0
-step = 280
+# # visualize training data
+
+d = su.unpickle("output/ratings_tuples_linear")
+ratings = d["ratings"]
+
+ratings = [rij for (i, j, rij) in ratings]
+
+import matplotlib.pyplot as plt
+plt.hist(ratings,5)
+plt.show()
+
+# ----------------------------------------------------------------------------
+
+# # visualize distribution of predicted ratings
+K = 20
+run = 2
+step = 260
 queries = su.unpickle("output/mfact_%d_run_%d/predictions" % (K,run))
 
 ratings = []
