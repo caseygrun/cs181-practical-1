@@ -24,7 +24,7 @@ data_train = su.unpickle("ratings_tuple_std")
 
 # choose a number of features, limit the time the simulation runs
 K = 5
-max_steps = 2
+max_steps = 2 # change this to something reasonable, like 200 or 500
 
 # update this for each trial you do with a particular k
 run = 0
