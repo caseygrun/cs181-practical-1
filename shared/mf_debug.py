@@ -48,11 +48,13 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
     # initialize random user and book feature matrices
     P = np.random.rand(N,K)
     #Q = np.random.rand(D,K)
-    Q = np.ones((N,K))
+    Q = np.ones((D,K))
 
     # initialize random bias vectors
     #Bn = np.random.rand(N,1) # N x 1
     #Bd = np.random.rand(D,1) # D x 1
+    Bn = np.zeros((N,1))
+    Bd = np.zeros((N,1))
 
     # initialize total error
     e = 0
@@ -116,5 +118,3 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
 
     # return results
     return results()
-
-mfact = mfact2

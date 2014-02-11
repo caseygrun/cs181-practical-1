@@ -111,3 +111,25 @@ def standardize(data):
     mean = data.mean(axis=0)
     std  = data.std(axis=0)
     return (data - mean)/std
+
+def rmse(data, predictions):
+	"""
+	"""
+	return math.sqrt(sum((data-predict)**2)/len(data))
+
+def prediction_rmse(predictions, dataFile):
+	dataWithheld = su.unpickle(dataFile)
+
+	predictList = []
+	ratingList = []
+	for prediction in predictions:
+		predictList.append(prediction['rating'])
+		user = prediction['user']
+		bookId = dataWithheld['book_isbn_to_index'][prediction['isbn']]
+		rating = [r for (i,j,r) in dataWithheld['ratings'] if i == user and j == bookId]
+		if len(rating) == 1:
+			ratingList.append(rating[0])
+		else:
+			print "ERROR"
+
+	return rmse(ratingList, predictList)

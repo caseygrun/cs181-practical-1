@@ -1,10 +1,10 @@
 # ----------------------------------------------------------------------------
 # CS 181 | Practical 1 | Predictions
 # Casey Grun
-# 
+#
 # books.py
 # Contains shared utility functions for the books problem
-# 
+#
 # ----------------------------------------------------------------------------
 
 
@@ -55,7 +55,7 @@ def make_predictions(ratings_data, mfact_data):
 
 		# print progress
 		# if DEBUG: print ("%d / %d : " % (i+1,L)),
-		
+
 		# lookup user and book index
 		user_index = query["user"] - 1
 		book_index = book_isbn_to_index[query["isbn"]]
@@ -63,14 +63,15 @@ def make_predictions(ratings_data, mfact_data):
 		# calculate predicted rating
 		rating_float = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index]) \
 			* scale + center
-		
+
 		# coerce to range (1,5); round, convert to int
-		rating = int(round(max(1,min(5,rating_float))))
+		#rating = int(round(max(1,min(5,rating_float))))
+		rating = max(1,min(5,rating_float))
 
 		# store both values so we can do visualization of distributions later
 		query["rating"] = rating
 		query["rating_f"] = rating_float
-		
+
 		# print value
 		# if DEBUG: print "%f -> %d" % (rating_float, rating)
 
@@ -79,15 +80,15 @@ def make_predictions(ratings_data, mfact_data):
 def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple", withhold=20000):
 	"""
 	Loads the training data, standardizes it, withholds points, and converts it
-	to the desired format. This produces two dicts: `data_train` and 
-	`data_withhold`. `data_train` is pickled and saved to `filename`, while 
+	to the desired format. This produces two dicts: `data_train` and
+	`data_withhold`. `data_train` is pickled and saved to `filename`, while
 	`data_withhold` is pickled and saved to `filename` + "_withheld"
 
 	Arguments:
 
 		filename	: File name to save the data to
 		standardize : one of:
-			-	True	: standardize the data by subtracting the mean and 
+			-	True	: standardize the data by subtracting the mean and
 			dividing by the standard deviation
 			-	'linear': standardize by subtracting 1 and dividing by 4
 			-	False	: do not standardize
@@ -98,19 +99,19 @@ def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple"
 			-	"tuple"	: encode the ratings as a list of tuples (i, j, r)
 			where i is the user index, j is the book index, and r is the rating
 
-	Returns: two dicts: data_train and data_withhold; each has the following 
-	keys. 
+	Returns: two dicts: data_train and data_withhold; each has the following
+	keys.
 
-		-	"ratings" : a list of tuples (i,j,r) where i is the user, j is the 
+		-	"ratings" : a list of tuples (i,j,r) where i is the user, j is the
 			book, and r is the rating that the user gave the book
-		-	"book_isbn_to_index" : dict that maps the ISBN for each book to a 
+		-	"book_isbn_to_index" : dict that maps the ISBN for each book to a
 			numerical index j.
 		-	"N" : the number of users
 		-	"D" : the number of books
 		-	"T" : the number of ratings
 		-	"center" : the number used to offset the ratings (for standardization)
 		-	"scale" : the number used to scale the ratings (for standardization);
-			The ratings can be de-standardized by: 
+			The ratings can be de-standardized by:
 			destandardized = standardized * scale + center
 		-	"mean" : the mean of the ratings
 		-	"variance" : the variance of the ratings
@@ -125,7 +126,7 @@ def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple"
 	# standardize ratings
 	print "Training data: "
 	data_train = standardize_ratings(data_train, standardize)
-	
+
 	print "Withheld data: "
 	data_withhold = standardize_ratings(data_withhold, False)
 
@@ -144,13 +145,13 @@ def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple"
 
 def build_ratings_tuple():
 	"""
-	Loads the training data for N users and D books, and builds a list of tuples 
+	Loads the training data for N users and D books, and builds a list of tuples
 
 	Returns: a dict with the following fields:
 
-		-	`ratings` : a list of tuples (i,j,r) where i is the user, j is the 
+		-	`ratings` : a list of tuples (i,j,r) where i is the user, j is the
 			book, and r is the rating that the user gave the book
-		-	`book_isbn_to_index` : dict that maps the ISBN for each book to a 
+		-	`book_isbn_to_index` : dict that maps the ISBN for each book to a
 			numerical index j.
 		-	`N` : the number of users
 		-	`D` : the number of books
@@ -218,22 +219,22 @@ def partition_ratings(data,withhold):
 
 def standardize_ratings(data, mode=True):
 	"""
-	Standardizes a set of ratings 
+	Standardizes a set of ratings
 
 	Arguments:
 
 		data	: dict of the form returned by build_ratings_tuple
 		mode	: one of:
-			-	True	: standardize the data by subtracting the mean and 
+			-	True	: standardize the data by subtracting the mean and
 			dividing by the standard deviation
 			-	'linear': standardize by subtracting 1 and dividing by 4
 			-	False	: do not standardize
 
 	Returns:
 
-		data	: dict of the form returned by build_ratings, but augmented 
+		data	: dict of the form returned by build_ratings, but augmented
 			with the following keys
-			-	"center"	: value subtracted from each rating 
+			-	"center"	: value subtracted from each rating
 			-	"scale"		: rating is divided by the sqrt of this value
 			-	"mean"		: mean of the training data
 			-	"variance"	: variance of the training data
@@ -244,7 +245,7 @@ def standardize_ratings(data, mode=True):
 	T = len(data["ratings"])
 	x = 0.0
 	x2 = 0.0
-		
+
 	for (i,j,Rij) in data["ratings"]:
 		x += Rij
 		x2 += Rij**2
@@ -262,7 +263,7 @@ def standardize_ratings(data, mode=True):
 		scale = std
 
 	elif (mode == 'linear'):
-		
+
 		print "Standardizing ratings to the interval [0,1]..."
 		center = 1
 		scale = 4
@@ -282,7 +283,7 @@ def standardize_ratings(data, mode=True):
 
 def ratings_tuple_to_lil(ratings_tuple, N, D):
 	"""
-	Converts a list of tuples to an N x D 
+	Converts a list of tuples to an N x D
 	scipy.sparse.lil_matrix
 	"""
 	ratings = sp.lil_matrix((N,D))
