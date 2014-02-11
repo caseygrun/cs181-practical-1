@@ -124,7 +124,7 @@ def prediction_rmse(predictions, dataFile):
 	ratingList = []
 	for prediction in predictions:
 		predictList.append(prediction['rating'])
-		user = prediction['user']
+		user = prediction['user'] - 1
 		bookId = dataWithheld['book_isbn_to_index'][prediction['isbn']]
 		rating = [r for (i,j,r) in dataWithheld['ratings'] if i == user and j == bookId]
 		if len(rating) == 1:

@@ -64,8 +64,7 @@ def make_predictions(ratings_data, mfact_data):
 		rating_float = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index]) \
 			* scale + center
 
-		# coerce to range (1,5); round, convert to int
-		#rating = int(round(max(1,min(5,rating_float))))
+		# coerce to range (1,5); round
 		rating = max(1,min(5,rating_float))
 
 		# store both values so we can do visualization of distributions later
