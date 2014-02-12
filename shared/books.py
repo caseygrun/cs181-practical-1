@@ -22,7 +22,7 @@ def debug(fmt, arg=tuple()):
 
 def rmse_withheld(trainData, ratings_data, mfact_data, use_biases=False):
 	"""
-	Takes a factorization produced from a set of training data, and calculates 
+	Takes a factorization produced from a set of training data, and calculates
 	the RMSE with a set of withheld data.
 
 	Arguments:
@@ -49,17 +49,16 @@ def rmse_withheld(trainData, ratings_data, mfact_data, use_biases=False):
 	error = 0.0
 
 	for (i,j,r) in ratings_data['ratings']:
-		
+
 		if(not use_biases):
-			predictedR = (np.dot(P[i,:],Q[j,:]) + mean) \
-				* scale + center
+			predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		else:
 			predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
-				* scale + center
-		
-		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
+				* scale + center
+		predictedR = max(1,min(5,predictedR))
 		error += (r - predictedR)**2
-		# print r, predictedR
+		#print P[i,:],Q[j,:],predictedR,r
+
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
@@ -108,8 +107,9 @@ def make_predictions(ratings_data, mfact_data):
 		book_index = book_isbn_to_index[query["isbn"]]
 
 		# calculate predicted rating
-		rating_float = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index]) \
-			* scale + center
+		#rating_float = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index]) \
+		#	* scale + center
+		rating_float = np.dot(P[user_index,:],Q[book_index,:]) * scale + center
 
 		# coerce to range (1,5); round
 		rating = max(1,min(5,rating_float))
