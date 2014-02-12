@@ -1,4 +1,3 @@
-
 # ----------------------------------------------------------------------------
 # CS 181 | Practical 1 | Predictions
 # Casey Grun
@@ -69,4 +68,3 @@ print_table()
 def print_table():
 	print "       N	       D	       K	   alpha	    beta	     eps	   steps	    RMSE"
 	print "%8d	%8d	%8d	%8f	%8f	%8f	%8d	%8f" % (N, D, K, alpha, beta, epsilon, data_mfact["step"], rmse)
-

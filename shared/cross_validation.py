@@ -74,4 +74,3 @@ print rmse
 # predictions = books.make_predictions(data_train, data_mfact)
 
 # # write the predictions
-# util.write_predictions(predictions,("predictions_%d_run_%d.csv" % (K, run)))
