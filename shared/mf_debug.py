@@ -48,7 +48,7 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
     # initialize random user and book feature matrices
     P = np.random.rand(N,K)
     Q = np.random.rand(D,K)
-    #Q = np.ones((D,K))
+    # Q = np.ones((D,K))
 
     # initialize random bias vectors
     #Bn = np.random.rand(N,1) # N x 1
@@ -106,6 +106,10 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
 
 
         # update P, Q, Bn, and Bd by gradient descent
+        dP = np.zeros_like(P)
+        dQ = np.zeros_like(Q)
+        dBn = np.zeros_like(Bn)
+        dBd = np.zeros_like(Bd)
         for (i,j,Rij) in R:
             """eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
             P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
@@ -113,11 +117,18 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_ever
             Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i])
             Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j])"""
             eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
-            P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
-            Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+            # P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+            # Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+            dP[i,:] += alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+            dQ[j,:] += + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+
+        P += dP
+        Q += dQ
+        Bn += dBn
+        Bd += dBd    
 
     if step == steps-1:
-        print "Gave up after %d steps with delta-error = %d" % (step+1, de)
+        print "Gave up after %d steps with delta-error = %f" % (step+1, de)
 
     # return results
     return results()
