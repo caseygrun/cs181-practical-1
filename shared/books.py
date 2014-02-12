@@ -42,6 +42,7 @@ def rmse_withheld(trainData, ratings_data, mfact_data):
 			* scale + center
 		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		error += (r - predictedR)**2
+		print P[i,:],Q[j,:],predictedR, r
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
@@ -94,7 +95,7 @@ def make_predictions(ratings_data, mfact_data):
 			* scale + center
 
 		# coerce to range (1,5); round
-		rating = max(1,min(5,rating_float))
+		rating = max(1,min(5,rating_float[0]))
 
 		# store both values so we can do visualization of distributions later
 		query["rating"] = rating

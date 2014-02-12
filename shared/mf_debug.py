@@ -53,8 +53,8 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.1, save_every=
     # initialize random bias vectors
     #Bn = np.random.rand(N,1) # N x 1
     #Bd = np.random.rand(D,1) # D x 1
-    Bn = np.zeros((N,1))
-    Bd = np.zeros((D,1))
+    Bn = np.zeros(N)
+    Bd = np.zeros(D)
 
     # initialize total error
     e = 0

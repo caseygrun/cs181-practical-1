@@ -9,28 +9,26 @@ import shared_utils as su
 
 
 # do this once to build the ratings and save them to ratings_tuple_std
-#books.build_ratings(filename="ratings_tuple_std", standardize=True, withhold=80000)
+#books.build_ratings(filename="ratings_tuple_std", standardize=True, withhold=20000)
 
 # load training data
 data_train = su.unpickle("ratings_tuple_std")
 data_withheld = su.unpickle("ratings_tuple_std_withheld")
 
-rmses = []
-
 K = 1
-max_steps = 200
-run = 2
-data_mfact = mf.mfact_cont(data_train["ratings"], data_train["N"], data_train["D"], \
-        K, 'debug_data/mfact_1_run_1_180', steps=max_steps, filename=("debug_data/mfact_%d_run_%d" % (K, run)))
-
+max_steps = 2000
+run = 4
+"""data_mfact = mf.mfact_cont(data_train["ratings"], data_train["N"], data_train["D"], \
+        K, 'debug_data/mfact_1_run_3_480', steps=max_steps, filename=("debug_data/mfact_%d_run_%d" % (K, run)))"""
+data_mfact = su.unpickle("debug_data/mfact_1_run_4_960")
 rmse = books.rmse_withheld(data_train, data_withheld, data_mfact)
 print rmse
 
 # make some predictions
-predictions = books.make_predictions(data_train, data_mfact)
+#predictions = books.make_predictions(data_train, data_mfact)
 
 # write the predictions
-util.write_predictions(predictions,("predictions_%d_run_%d.csv" % (K, run)))
+#util.write_predictions(predictions,("predictions_%d_run_%d.csv" % (K, run)))
 
 """for x in [1, 2, 3, 4, 5]:
 
