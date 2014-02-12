@@ -50,6 +50,7 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=2
     Q = np.random.rand(D,K) * 4 + 1
     #Q = np.ones((D,K))
 
+
     # initialize random bias vectors
     #Bn = np.random.rand(N,1) # N x 1
     #Bd = np.random.rand(D,1) # D x 1
@@ -107,6 +108,10 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=2
 
 
         # update P, Q, Bn, and Bd by gradient descent
+        dP = np.zeros_like(P)
+        dQ = np.zeros_like(Q)
+        dBn = np.zeros_like(Bn)
+        dBd = np.zeros_like(Bd)
         for (i,j,Rij) in R:
             """eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
             P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
@@ -210,12 +215,23 @@ def mfact_cont(R, N, D, K, cont_file, steps=500, alpha=0.01, beta=0.02, epsilon=
             Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
             Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i])
             Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j])"""
-            eij = Rij - np.dot(P[i,:],Q[j,:])
+            """eij = Rij - np.dot(P[i,:],Q[j,:])
             P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
-            Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+            Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])"""
+
+            eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
+            # P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+            # Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+            dP[i,:] += alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+            dQ[j,:] += + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+
+        P += dP
+        Q += dQ
+        Bn += dBn
+        Bd += dBd
 
     if step == steps-1:
-        print "Gave up after %d steps with delta-error = %d" % (step+1, de)
+        print "Gave up after %d steps with delta-error = %f" % (step+1, de)
 
     # return results
     return results()

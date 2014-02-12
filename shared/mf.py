@@ -35,7 +35,7 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 		beta    	: the regularization parameter
 		epsilon 	: the minimum difference in error (below which to quit)
 		save_every	: save results after every `save_every` iterations
-		filename	: file to save results to. Defaults to "output/mfact_K_step
+		filename	: file to save results to. Defaults to "output/mfact_K_step"
 
 	Returns: a dict with the following keys:
 		"P"     	: an array (N x K) containing user features
@@ -69,6 +69,10 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 	t = time.clock()
 	debug("Starting Matrix Factorization into %d principal components...", (K,))
 	debug("Step \t Of \t Time \t Error \t Change")
+
+	# set default filename
+	if(filename==None):
+		filename = "output/mfact_%d" % K
 
 	# for each step (epoch)
 	for step in xrange(steps):

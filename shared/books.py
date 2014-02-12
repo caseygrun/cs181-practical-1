@@ -20,7 +20,20 @@ DEBUG = True
 def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
-def rmse_withheld(trainData, ratings_data, mfact_data):
+def rmse_withheld(trainData, ratings_data, mfact_data, use_biases=False):
+	"""
+	Takes a factorization produced from a set of training data, and calculates
+	the RMSE with a set of withheld data.
+
+	Arguments:
+		train_data   	: data object from the training data
+		withheld_data	: data object from the withheld data
+		mfact_data   	: data object from mfact
+
+	Returns:
+		error			: RMSE between predicted ratings and actual ratings
+						from the withheld data
+	"""
 	# load data from the original training set
 	center = trainData["center"]
 	scale = trainData["scale"]
@@ -36,13 +49,16 @@ def rmse_withheld(trainData, ratings_data, mfact_data):
 	error = 0.0
 
 	for (i,j,r) in ratings_data['ratings']:
-		#predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
-		#	* scale + center
-		predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
-		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
+
+		if(not use_biases):
+			predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
+		else:
+			predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
+				* scale + center
 		predictedR = max(1,min(5,predictedR))
 		error += (r - predictedR)**2
 		#print P[i,:],Q[j,:],predictedR,r
+
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
@@ -121,7 +137,7 @@ def user_mean(data):
 	return userTotal / userCount
 
 
-def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple", withhold=20000):
+def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple", withhold=20000, discard=0):
 	"""
 	Loads the training data, standardizes it, withholds points, and converts it
 	to the desired format. This produces two dicts: `data_train` and
@@ -138,6 +154,7 @@ def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple"
 			-	False	: do not standardize
 		withhold : number of points to withhold (must be less than the number
 				of points in the training data)
+		discard : number of points to discard
 		format   	: one of:
 			-	"lil"	: encode the ratings as a scipy.sparse.lil_matrix
 			-	"tuple"	: encode the ratings as a list of tuples (i, j, r)
@@ -165,7 +182,7 @@ def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple"
 	data = build_ratings_tuple()
 
 	# partition ratings
-	(data_train, data_withhold) = partition_ratings(data,withhold)
+	(data_train, data_withhold) = partition_ratings(data,withhold,discard=discard)
 
 	# standardize ratings
 	print "Training data: "
@@ -227,7 +244,7 @@ def build_ratings_tuple():
 	return { "ratings": ratings, "book_isbn_to_index": book_isbn_to_index , \
 		"N": N, "D": D, "T": T}
 
-def partition_ratings(data,withhold):
+def partition_ratings(data,withhold=0,discard=0):
 	"""
 	Partitions a list of rankings randomly into a set to be trained and a set
 	to be withheld.
@@ -235,6 +252,7 @@ def partition_ratings(data,withhold):
 	Arguments:
 		data 		: data object of the form returned by build_ratings_tuple
 		withhold	: number of ratings to withhold (must be < len(ratings))
+		discard		: number of ratings to discard (must be < len(ratings) - withhold)
 
 	Returns:
 		data_train	: data object to train on
@@ -247,7 +265,7 @@ def partition_ratings(data,withhold):
 	data_withhold = data.copy()
 	ratings = data["ratings"]
 
-	print "Witholding %d ratings, training on %d" % (withhold, len(ratings)-withhold)
+	print "Witholding %d ratings, training on %d, discarding %d" % (withhold, len(ratings)-withhold-discard, discard)
 
 	# randomly permute ratings
 	random.shuffle(ratings)
@@ -255,9 +273,11 @@ def partition_ratings(data,withhold):
 	# partition ratings into training set and withheld set
 	data_withhold["ratings"] = ratings[0:withhold]
 	data_withhold["T"] = len(data_withhold["ratings"])
+	assert len(data_withhold["ratings"]) == withhold
 
-	data_train["ratings"] = ratings[withhold:]
+	data_train["ratings"] = ratings[withhold:len(ratings)-discard]
 	data_train["T"] = len(data_train["ratings"])
+	assert len(data_train["ratings"]) == (len(ratings)-withhold-discard)
 
 	return (data_train, data_withhold)
 
