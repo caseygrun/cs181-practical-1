@@ -38,11 +38,11 @@ def rmse_withheld(trainData, ratings_data, mfact_data):
 	for (i,j,r) in ratings_data['ratings']:
 		#predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
 		#	* scale + center
-		predictedR = (np.dot(P[i,:],Q[j,:]) + mean) \
-			* scale + center
+		predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		#predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
+		predictedR = max(1,min(5,predictedR))
 		error += (r - predictedR)**2
-		print P[i,:],Q[j,:],predictedR, r
+		#print P[i,:],Q[j,:],predictedR,r
 
 	error /= len(ratings_data['ratings'])
 	error = math.sqrt(error)
@@ -91,11 +91,12 @@ def make_predictions(ratings_data, mfact_data):
 		book_index = book_isbn_to_index[query["isbn"]]
 
 		# calculate predicted rating
-		rating_float = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index]) \
-			* scale + center
+		#rating_float = (np.dot(P[user_index,:],Q[book_index,:]) + mean + Bn[user_index] + Bd[book_index]) \
+		#	* scale + center
+		rating_float = np.dot(P[user_index,:],Q[book_index,:]) * scale + center
 
 		# coerce to range (1,5); round
-		rating = max(1,min(5,rating_float[0]))
+		rating = max(1,min(5,rating_float))
 
 		# store both values so we can do visualization of distributions later
 		query["rating"] = rating
