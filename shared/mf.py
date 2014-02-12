@@ -20,7 +20,7 @@ def debug(fmt, arg=tuple()):
 	if DEBUG: print fmt % arg
 
 # steps=5000, alpha=0.0002, beta=0.02, epsilon=0.001, save_every=20
-def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_every=20, filename=None):
+def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_every=20, use_bias=True, filename=None):
 	"""
 	Adapted from Albert Au Yeung (2010)
 	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
@@ -53,13 +53,17 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 	Bn = np.random.rand(N,1) # N x 1
 	Bd = np.random.rand(D,1) # D x 1
 
+	if(not use_bias):
+		Bn = np.zeros((N,1))
+		Bd = np.zeros((D,1))
+
 	# initialize total error
 	e = 0
 	ep = 0
 
 	# small function to serialize the results
 	def results():
-		return {"P":P, "Q":Q, "Bn":Bn, "Bd":Bd, "mean":mean}
+		return {"P":P, "Q":Q, "Bn":Bn, "Bd":Bd, "mean":mean, "step":step, "de":de, "e":e}
 
 	# calculate mean of R
 	debug("Calculating mean of R...")
@@ -96,23 +100,39 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 
 		# break if error is small enough
 		if abs(de) < epsilon:
-			print "Finished after step %d with delta-error = %d" % (step, de)
+			print "Finished after step %d with delta-error = %f" % (step, de)
 			break
 
 		# periodically save results
 		if (step % save_every) == 0:
 			su.pickle(results(),filename + "_%d" % step)
 
-		# update P, Q, Bn, and Bd by gradient descent
+		dP = np.zeros_like(P)
+		dQ = np.zeros_like(Q)
+		dBn = np.zeros_like(Bn)
+		dBd = np.zeros_like(Bd)
+		
+		# calculate gradient
 		for (i,j,Rij) in R:
 			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
-			P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
-			Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
-			Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
-			Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
+			# P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+			# Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+			# Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
+			# Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
+			dP[i,:] += alpha * (2 * eij * Q[j,:] - beta * P[i,:])
+			dQ[j,:] += alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+			if use_bias:
+				dBn[i]  += alpha * (2 * eij          - beta * Bn[i]) 
+				dBd[j]  += alpha * (2 * eij          - beta * Bd[j]) 
+
+		# update P, Q, Bn, Bd
+		P += dP
+		Q += dQ
+		Bn += dBn
+		Bd += dBd
 
 	if step == steps-1:
-		print "Gave up after %d steps with delta-error = %d" % (step+1, de)
+		print "Gave up after %d steps with delta-error = %f" % (step+1, de)
 
 	# return results
 	return results()
