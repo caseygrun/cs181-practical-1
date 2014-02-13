@@ -1,7 +1,7 @@
 Experiments
 ===========
 
--	Fake data (full data set) --- reconstruction.py
+-	Fake data (given full R; no bias) --- reconstruction.py
 	Results:
 
        N	       D	       K	   alpha	    beta	     eps	   steps	    RMSE
@@ -22,12 +22,30 @@ Experiments
 
        N	       D	       K	   alpha	    beta	     eps	   steps	    RMSE
      100	     100	       2	0.001000	0.020000	0.000050	     282	7.390202
+     100	     100	       3	0.001000	0.020000	0.000050	     659	8.204818
 
+-	Fake data (given full R; bias) --- reconstruction.py
+	
+       N	       D	       K	   alpha	    beta	     eps	   steps	    RMSE
+     100	     100	       3	0.001000	0.020000	0.000050	     579	27.676833
+     100	     100	       3	0.001000	0.020000	0.000050	     734	29.181141
 
 -	Fake data (partial data set; withhold 10%) --- reconstruction.py
 
 -	Cross-validation (small data set, no biases)
+
+
+-	Cross-validation (small data set, with biases)
 	
+       N	       D	       K	   alpha	    beta	     eps	   steps	  points	  w/held	 discard	    RMSE
+   12787	  131378	       1	0.001000	0.020000	0.000050	     199	  200000	    2000	  180000	0.890601
+   12787	  131378	       1	0.001000	0.020000	0.000050	     199	  200000	    2000	  180000	0.867243
+   12787	  131378	       1	0.001000	0.020000	0.000050	     499	  200000	    2000	  180000	0.908410
+   12787	  131378	       2	0.001000	0.020000	0.000050	     199	  200000	    2000	  180000	0.933478
+
 -	Cross-validation (full data set, no biases)
 
--	Cross-validation (full data set, with biases)
+-	Cross-validation (full data set---witholding 2000, with biases)
+
+       N	       D	       K	   alpha	    beta	     eps	   steps	  points	  w/held	 discard	    RMSE
+   12787	  131378	       5	0.000500	0.020000	0.000050	     499	  200000	    2000	       0	0.939141
