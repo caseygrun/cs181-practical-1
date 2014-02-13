@@ -17,14 +17,14 @@ import shared_utils as su
 
 
 # do this once to build the ratings and save them to ratings_tuple_std
-books.build_ratings(filename="ratings_tuple_std", standardize=True, withhold=20000)
+books.build_ratings(filename="ratings_tuple_std", standardize=False, withhold=0)
 
 # load training data
 data_train = su.unpickle("ratings_tuple_std")
 
 # choose a number of features, limit the time the simulation runs
-K = 5
-max_steps = 2 # change this to something reasonable, like 200 or 500
+K = 3
+max_steps = 500 # change this to something reasonable, like 200 or 500
 
 # update this for each trial you do with a particular k
 run = 0

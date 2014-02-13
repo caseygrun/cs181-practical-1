@@ -93,7 +93,7 @@ def make_predictions(ratings_data, mfact_data):
 	mean = mfact_data["mean"]
 
 	# load the set of requested predictions
-	queries = util.load_test("../data/books/ratings-test.csv")
+	queries = util.load_test("../../data/books/ratings-test.csv")
 	L = len(queries)
 	debug("Making %d predictions",L)
 
@@ -137,7 +137,7 @@ def user_mean(data):
 	return userTotal / userCount
 
 
-def build_ratings(filename="ratings_tuple_std", standardize=True, format="tuple", withhold=20000, discard=0):
+def build_ratings(filename="ratings_tuple_std", standardize=False, format="tuple", withhold=20000, discard=0):
 	"""
 	Loads the training data, standardizes it, withholds points, and converts it
 	to the desired format. This produces two dicts: `data_train` and
@@ -220,7 +220,7 @@ def build_ratings_tuple():
 	"""
 
 	print "Loading Users..."
-	users = util.load_users("../data/books/users.csv")
+	users = util.load_users("../../data/books/users.csv")
 	user_ids = sorted([ user["user"] for user in users ])
 	N = len(user_ids)
 	del users
@@ -228,7 +228,7 @@ def build_ratings_tuple():
 
 
 	print "Loading Books..."
-	books = util.load_books("../data/books/books.csv")
+	books = util.load_books("../../data/books/books.csv")
 	book_isbns = sorted([ book["isbn"] for book in books ])
 	book_isbn_to_index = dict( zip(book_isbns,range(len(book_isbns))) )
 	D = len(book_isbns)
@@ -236,7 +236,7 @@ def build_ratings_tuple():
 
 
 	print "Loading Trainings..."
-	train = util.load_train("../data/books/ratings-train.csv")
+	train = util.load_train("../../data/books/ratings-train.csv")
 	T = len(train)
 	print "Loaded %d ratings." % T
 	ratings = [(rating["user"]-1, book_isbn_to_index[rating["isbn"]], (rating["rating"])) for rating in train]
