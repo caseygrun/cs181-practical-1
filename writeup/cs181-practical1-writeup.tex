@@ -19,6 +19,22 @@
 \maketitle
 
 \section{Warmup}
+We used the K-Means algorithm to cluster the images of the CIFAR-10 dataset, which consists of 60000 total 32x32 color images. We only clustered a single batch, consisting of 10000 images. The algorithm was run for $k=5,10,15$.\\
+The following sets of images show the mean images of the k clusters as well as the 25 images that are closest to each of the respective means, for $k=5,10,15$.\\
+
+\includegraphics[width=10cm]{images/k5us.png}\\
+\includegraphics[width=15cm]{images/k5reps.png}\\
+
+\includegraphics[width=10cm]{images/k10us.png}\\
+\includegraphics[width=15cm]{images/k10reps.png}\\
+
+Although features are not discernible from the mean images, there are still trends of lighter colors versus darker colors, which is consistent with the representative images. For example, in $k=5$, the 2nd cluster mean is mostly dark around the edges whereas the 4th cluster mean is mostly light around the edges, and the representative images share these features.\\
+We use the objective function:
+$$J(\{r_n\}^N_{n=1},\{\mu_k\}^K_{k=1})=\sum^N_{n=1}\sum^K_{k=1}r_{nk}||x_n-\mu_k||^2_2$$
+where $r_n$ is the responsibilities vector of the $n$th data point, $\mu_k$ is the mean of the $k$th cluster, and $x_n$ is the $n$th data point. Plots of the objective function as a function of iteration for $k=5,10,15$ are shown below.
+
+\includegraphics[width=7cm]{images/k5objectives.png}
+\includegraphics[width=7cm]{images/k10objectives.png}
 
 \section{Approaches considered}
 K-Means, K-nearest neighbor, PCA, SVD, PMF

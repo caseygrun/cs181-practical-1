@@ -71,6 +71,7 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 	debug("Calculating mean of R...")
 	mean = 1./len(R) * float(sum([ Rij for (i,j,Rij) in R ]))
 	debug("Mean: %f", (mean,))
+    debug("alpha: %f, beta: %f, epsilon: %f", (alpha, beta, epsilon))
 
 	t = time.clock()
 	debug("Starting Matrix Factorization into %d principal components...", (K,))
