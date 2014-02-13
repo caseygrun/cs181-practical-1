@@ -8,6 +8,7 @@
 # ----------------------------------------------------------------------------
 
 import sys
+import signal
 import math
 import random
 import numpy as np
@@ -17,6 +18,15 @@ import mf
 import util
 import shared_utils as su
 
+
+def print_table():
+	print "       N	       D	       K	   alpha	    beta	     eps	   steps	    RMSE"
+	print "%8d	%8d	%8d	%8f	%8f	%8f	%8d	%8f" % (N, D, K, alpha, beta, epsilon, data_mfact["step"], rmse)
+
+def signal_handler(signal, frame):
+    print_table()
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
 
 
 # choose a size of P and Q
@@ -53,7 +63,7 @@ Ra = Ra[0:max(int(len(Ra)*(1-withhold)),1)]
 # do factorization
 data_mfact = mf.mfact(Ra, N, D, \
 	K, steps=max_steps, alpha=alpha, beta=beta, epsilon=epsilon, \
-	use_bias=False, filename=("output/reconstruct/mfact_%d_run_%d" % (K, run)))
+	use_bias=True, filename=("output/reconstruct/mfact_%d_run_%d" % (K, run)))
 
 # cross-validate with the original P, Q
 Pp = data_mfact["P"]
@@ -65,6 +75,3 @@ print R - Rp
 rmse = np.sqrt(np.sum((R-Rp)**2))
 print_table()
 
-def print_table():
-	print "       N	       D	       K	   alpha	    beta	     eps	   steps	    RMSE"
-	print "%8d	%8d	%8d	%8f	%8f	%8f	%8d	%8f" % (N, D, K, alpha, beta, epsilon, data_mfact["step"], rmse)

@@ -54,7 +54,8 @@ def rmse_withheld(trainData, ratings_data, mfact_data, use_biases=False):
 			predictedR = np.dot(P[i,:],Q[j,:]) * scale + center
 		else:
 			predictedR = (np.dot(P[i,:],Q[j,:]) + mean + Bn[i] + Bd[j]) \
-				* scale + center
+				* scale + center
+
 		predictedR = max(1,min(5,predictedR))
 		error += (r - predictedR)**2
 		#print P[i,:],Q[j,:],predictedR,r
@@ -314,10 +315,14 @@ def standardize_ratings(data, mode=True):
 	for (i,j,Rij) in data["ratings"]:
 		x += Rij
 		x2 += Rij**2
-
-	mean = x / T
-	var = (x2/T) - mean**2
-	std = math.sqrt(var)
+	if T > 0:
+		mean = x /T
+		var = (x2/T) - mean**2
+		std = math.sqrt(var)
+	else:
+		mean = 0
+		var = 0
+		std = 0
 	print "Mean: %f , Variance: %f , Std. Dev: %f" % (mean, var, std)
 
 	if(mode == True):

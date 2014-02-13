@@ -11,9 +11,10 @@ import numpy.linalg as la
 import shared_utils as su
 import random
 import math
+import sys
 import scipy.optimize
 
-def check(N, D, K, alpha=0.01, beta=0.02, epsilon=1e-6):
+def check(N, D, K, alpha=0.01, beta=0.02, epsilon=1e-4):
 
 	def unroll(A):
 		"""
@@ -123,8 +124,9 @@ def check(N, D, K, alpha=0.01, beta=0.02, epsilon=1e-6):
 
 # check 10 times and average
 # enter different values for N, D, and K here. 
-rmses = [check(50,50,50, beta=0.02) for x in xrange(10)]
-print "Average error: ",
+trials = 1
+rmses = [check(50,50,5) for x in xrange(trials)]
+print "Average RMSE over %d trials: " % trials,
 print np.mean(rmses)
 sys.exit(0)
 
@@ -136,7 +138,7 @@ rmses = np.zeros((len(values),len(values),len(values)))
 for (i,N) in enumerate(values):
 	for (j,D) in enumerate(values):
 		for (k,K) in enumerate(values):
-			rmses[i,j,k] = check(N,D,K, beta=0.02)
+			rmses[i,j,k] = check(N,D,K)
 			print "N = %d \t D = %d \t K = %d \t RMSE = %d" % (N,D,K,rmses[i,j,k])
 
 su.pickle((values,rmses),"check_grad_data_b_0.02")
