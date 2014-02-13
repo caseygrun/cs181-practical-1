@@ -20,7 +20,7 @@ def debug(fmt, arg=tuple()):
     if DEBUG: print fmt % arg
 
 # steps=5000, alpha=0.0002, beta=0.02, epsilon=0.001, save_every=20
-def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=20, filename=None):
+def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=20, filename=None, batch=True):
     """
     Adapted from Albert Au Yeung (2010)
     http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
@@ -46,8 +46,8 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=2
     """
 
     # initialize random user and book feature matrices
-    P = np.random.rand(N,K) * 4 + 1
-    Q = np.random.rand(D,K) * 4 + 1
+    P = np.random.rand(N,K) * 3 + 1
+    Q = np.random.rand(D,K) * 3 + 1
     #Q = np.ones((D,K))
 
 
@@ -84,7 +84,6 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=2
         e = 0
         for (i,j,Rij) in R:
             #eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
-            #eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
             eij = Rij - np.dot(P[i,:],Q[j,:])
             e += pow(eij, 2)
 
@@ -129,7 +128,7 @@ def mfact(R, N, D, K, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=2
     # return results
     return results()
 
-def mfact_cont(R, N, D, K, cont_file, steps=500, alpha=0.01, beta=0.02, epsilon=0.1, save_every=20, filename=None):
+def mfact_cont(R, N, D, K, cont_file, steps=500, alpha=0.01, beta=0.0, epsilon=0.1, save_every=20, filename=None):
     """
     Adapted from Albert Au Yeung (2010)
     http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
@@ -215,20 +214,19 @@ def mfact_cont(R, N, D, K, cont_file, steps=500, alpha=0.01, beta=0.02, epsilon=
             Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
             Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i])
             Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j])"""
-            """eij = Rij - np.dot(P[i,:],Q[j,:])
+            eij = Rij - np.dot(P[i,:],Q[j,:])
+            PiTemp = P[i,:]
             P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
-            Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])"""
+            Q[j,:] = Q[j,:] + alpha * (2 * eij * PiTemp - beta * Q[j,:])
 
-            eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
-            # P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
-            # Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+            """eij = Rij - (mean + np.dot(P[i,:],Q[j,:]))
             dP[i,:] += alpha * (2 * eij * Q[j,:] - beta * P[i,:])
-            dQ[j,:] += + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
+            dQ[j,:] += + alpha * (2 * eij * P[i,:] - beta * Q[j,:])"""
 
-        P += dP
+        """"P += dP
         Q += dQ
         Bn += dBn
-        Bd += dBd
+        Bd += dBd"""
 
     if step == steps-1:
         print "Gave up after %d steps with delta-error = %f" % (step+1, de)
