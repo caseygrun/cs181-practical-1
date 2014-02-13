@@ -25,7 +25,7 @@ K-Means, K-nearest neighbor, PCA, SVD, PMF
 
 \section{Probabilistic Matrix Factorization}
 \subsection{Derivation}
-The probabilistic matrix factorization (PMF) approach attempts to decompose the ratings matrix $\mat{R}$ into two matrices: $\mat{P}$ representing the users and $\mat{Q}$ representing the books:
+The probabilistic matrix factorization (PMF) approach \cite{Mnih:2007wg} attempts to decompose the ratings matrix $\mat{R}$ into two matrices: $\mat{P}$ representing the users and $\mat{Q}$ representing the books:
 $$\mat{R} = \mat{P} \times \mat{Q}^T$$
 where:
 $$ 
@@ -63,7 +63,7 @@ $$\hat{r}_{i,j} = \vec{p_i} \cdot \vec{q_j}^T \approx r_{i,j}$$
 
 However, we only know a subset of the full matrix $\{r_{i,j}\}_{i=1, j=1}^{N,D}$; call that subset $T = \{(i, j, r_{i,j})\}$. We therefore need to iteratively train $\mat{P}$ and $\mat{Q}$, based only on the data in $T$. 
 
-We recognize that some aspects of the ratings for a particular book are not explained jointly by the user and book, but by either the user or the book alone; we will call these terms \emph{biases}. A bias is the component of a user's ratings (or a book's ratings) varying from the global mean, $\mu = \frac{1}{ND} \sum_{i=1}^{N}\sum_{j=1}^{D} r_{i,j}$. Let $\vec{b} = (b_1, b_2, \ldots b_N)$ represent the biases for each users and $\vec{c} = (c_1, c_2, \ldots c_D)$ represent the biases for each book. We will adopt a slightly more sophisticated model for predicting the ratings, such that:
+We recognize that some aspects of the ratings for a particular book are not explained jointly by the user and book, but by either the user or the book alone; we follow the approach of Paterek, Koren and Bell, and others in calling these terms \emph{biases} \cite{Paterek:2007va,Koren:2009uc}. A bias is the component of a user's ratings (or a book's ratings) varying from the global mean, $\mu = \frac{1}{ND} \sum_{i=1}^{N}\sum_{j=1}^{D} r_{i,j}$. Let $\vec{b} = (b_1, b_2, \ldots b_N)$ represent the biases for each users and $\vec{c} = (c_1, c_2, \ldots c_D)$ represent the biases for each book. We will adopt a slightly more sophisticated model for predicting the ratings, such that:
 $$\hat{r}_{i,j} = \mu + b_i + c_j + \vec{p_i} \cdot \vec{q_j}^T \approx r_{i,j}$$
 or:
 $$\mat{R} \approx \mat{P} \times \mat{Q}^T + (\mu + \vec{b} \otimes \vec{c})$$
@@ -98,7 +98,7 @@ c_{j}   &\gets p_{i,k} + \alpha \left(2 \left(r_{i,j} - \hat{r}_{i,j}\right)    
 We update $\vec{p_i}$, $\vec{q_j}$, $b{i}$, and $c_{j}$ for each pair $(i, j, r_{i,j}) \in T$. This process is repeated for some number of steps, or \emph{epochs}, until either some criterion for epochs is met (e.g. the change in the total error $E$ is less than some $\epsilon$, or the maximum number of epochs is exceeded). 
 
 \subsection{Optimization}
-The main issue we had with the PMF approach was that there were lots of meta-parameters to tune: the learning rate $\alpha$, the regularization parameter $\beta$, the number of latent factors $K$, and the criteria for determining convergence. We therefore tried the following reductionist methods for ensuring our code was correct:
+The main issue we had with the PMF approach was that there were lots of meta-parameters to tune: the learning rate $\alpha$, the regularization parameter $\beta$, the number of latent factors $K$, and the criteria for determining convergence. We estimated appropriate starting values for $K = 5$ and $\beta = 0.02$ based on literature on the Netflix prize \cite{Mnih:2007wg,Ott:2008tu}, and we experimented to determine that $\alpha = 0.001$ generally produced convergent solutions. We tried the following reductionist methods for validating our approach, and for further tuning these parameters:
 
 \begin{enumerate}
 \item Checking the gradient. We verified that our gradient function was correct by finite differences.
@@ -108,11 +108,11 @@ The main issue we had with the PMF approach was that there were lots of meta-par
  
 \end{enumerate}
 
-\subsection{Results}
+\subsection{Results and Conclusion}
 
+
+\bibliography{library}
+\bibliographystyle{ieeetr}
 
 
 \end{document}  
-\begin{document}
-
-\end{document}
