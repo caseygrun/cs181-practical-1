@@ -68,7 +68,16 @@ where $r_n$ is the responsibilities vector of the $n$th data point, $\mu_k$ is t
 	\caption{Objective function as a function of iteration for K-Means}
 \end{figure}
 
-We can see that for all 3 $k$s, the objective function never increases over the iteration, so the algorithm is constantly finding a better solution and converging to a (local) minimum. In addition, comparing the objective functions, $k=5$ reaches approximately $J=2.2\times 10^{8}$, $k=10$ converges to $J=1.8\times 10^{8}$, and $k=15$ converges to $J=1.7\times 10^{8}$.
+We can see that for all 3 $k$s, the objective function never increases over the iteration, so the algorithm is constantly finding a better solution and converging to a (local) minimum. In addition, comparing the objective functions, $k=5$ reaches approximately $J=2.2\times 10^{8}$, $k=10$ converges to $J=1.8\times 10^{8}$, and $k=15$ converges to $J=1.7\times 10^{8}$. As suspected, allowing more clusters allows the images to be closer to their respective cluster means.\\
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=8cm]{images/kplus5us.png}\\
+	\includegraphics[width=8cm]{images/kplus10us.png}\\
+	\caption{Cluster means for (top) $k=5$ and (bottom) $k=10$}
+\end{figure}
+
+We also implemented the K-Means++ algorithm. Shown below are mean images of the k clusters fo $k=5,10$. These are not qualitatively different from those of the K-Means algorithm. The objective function for $k=5$ reaches $J=2.15\times 10^{8}$, and for $k=10$ reaches $J=1.8\times 10^{8}$.
 
 \section{Approaches considered}
 K-Means, K-nearest neighbor, PCA, SVD, PMF

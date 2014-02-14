@@ -44,12 +44,14 @@ for userI in range(len(P)):
     print P[userI], means[userI]"""
 K=1
 max_steps = 500
-run = 1
+run = 2
 #data_mfact = mf.mfact_kfixed(data_train["ratings"], data_train["N"], data_train["D"], \
 #        K, steps=max_steps, filename=("debug_data/mfact_%d_run_%d" % (K, run)))
 #data_mfact = su.unpickle("debug_data/mfact_1_run_1_40")
-data_mfact = mf.mfact_kfixed(data_train["ratings"], data_train["N"], data_train["D"], \
-        K, steps=max_steps, save_every=50, filename=("debug_data/mfact_%d_run_%d" % (K, run)), contFile='debug_data/mfact_1_run_1_40',)
+#data_mfact = mf.mfact_kfixed(data_train["ratings"], data_train["N"], data_train["D"], \
+#        K, steps=max_steps, save_every=50, filename=("debug_data/mfact_%d_run_%d" % (K, run)), contFile='debug_data/mfact_1_run_1_50',)
+data_mfact = mf.mfact_pfixed(data_train["ratings"], data_train["N"], data_train["D"], \
+        K, steps=max_steps, save_every=25, filename=("debug_data/mfact_%d_run_%d" % (K, run)), contFile='debug_data/mfact_1_run_1_50',)
 
 rmse = books.rmse_withheld(data_train, data_withheld, data_mfact)
 print rmse
