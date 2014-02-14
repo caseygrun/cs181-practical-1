@@ -114,13 +114,15 @@ c_{j}   &\gets p_{i,k} + \alpha \left(2 \left(r_{i,j} - \hat{r}_{i,j}\right)    
 We update $\vec{p_i}$, $\vec{q_j}$, $b{i}$, and $c_{j}$ for each pair $(i, j, r_{i,j}) \in T$. This process is repeated for some number of steps, or \emph{epochs}, until either some criterion for epochs is met (e.g. the change in the total error $E$ is less than some $\epsilon$, or the maximum number of epochs is exceeded). 
 
 \subsection{Optimization}
-The main issue we had with the PMF approach was that there were many of meta-parameters to tune: the learning rate $\alpha$, the regularization parameter $\beta$, the number of latent factors $K$, and the criteria for determining convergence. We estimated appropriate starting values for $K = 5$ and $\beta = 0.02$ based on literature on the Netflix prize \cite{Mnih:2007wg,Ott:2008tu}, and we experimented to determine that $\alpha = 0.001$ generally produced convergent solutions. We tried the following reductionist methods for validating our approach, and for further tuning these parameters:
+The main issue we had with the matrix factorization approach was that there were many of meta-parameters to tune: the learning rate $\alpha$, the regularization parameter $\beta$, the number of latent factors $K$, and the criteria for determining convergence. We estimated appropriate starting values for $K = 5$ and $\beta = 0.02$ based on literature on the Netflix prize \cite{Mnih:2007wg,Ott:2008tu}, and we experimented to determine that $\alpha = 0.001$ generally produced convergent solutions. We tried the following reductionist methods for validating our approach, and for further tuning these parameters:
 
 \begin{enumerate}
 \item Checking the gradient. We verified that our gradient function was correct by finite differences.
-\item Recapitulating the user mean results. We tried setting $K=1$, $\beta=0$ and fixing $q_{j,k} = 1$. This gave us an RMSE of 0.77857---slightly better than the user mean results.
+\item Recapitulating the user mean results. We tried setting $K=1$, $\beta=0$ and fixing $q_{j,k} = 1$. This gave us an RMSE of 0.77857---slightly better than the user mean results. However, when $q_{j,k}$ is not fixed, the RMSE is greater than 1, which points to an instability in the algorithm.
 \item Reconstruction of fake data. We generated fake values for $\mat{P}$ and $\mat{Q}$, and multiplied them together to get a fake $\mat{R}$. We then trained the model on $T$ containing some fraction of the $r_{i,j}$'s.  
-\item Cross-validation. We withheld a subset (between 1--10\%) of our training data, trained the model on the remainder, computed the difference between the predicted ratings and the withheld ratings. We used this method to attempt to set our parameters
+\item Cross-validation. We withheld a subset (between 1--10\%) of our training data, trained the model on the remainder, computed the difference between the predicted ratings and the withheld ratings. We used this method to attempt to set our parameter.
+\item Tests were run using both standardized data, in which the ratings are scaled such that mean is 0 and standard deviation is 1, and non-standardized data.
+\item Ranging $k=1$ to 3 and calculating the RMSE on the withheld data shows a trend of increasing RMSE with $k$. However, these results are not valid given that $k=1$ does not give positive results.
  
 \end{enumerate}
 
