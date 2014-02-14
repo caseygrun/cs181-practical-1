@@ -3,9 +3,9 @@ import post_process as post
 import kmeans
 import load_data as load
 import visualize
+import matplotlib.pyplot as plt
 import copy
 import shared_utils as utils
-import argparse
 
 data = load.load_CIFAR('data_batch_1')
 

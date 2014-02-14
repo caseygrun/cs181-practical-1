@@ -79,13 +79,17 @@ We can see that for all 3 $k$s, the objective function never increases over the 
 
 We also implemented the K-Means++ algorithm. Shown below are mean images of the k clusters fo $k=5,10$. These are not qualitatively different from those of the K-Means algorithm. The objective function for $k=5$ reaches $J=2.15\times 10^{8}$, and for $k=10$ reaches $J=1.8\times 10^{8}$.
 
-\section{Approaches considered}
-\begin{center}K-Means, K-nearest neighbor, PCA, SVD, PMF\end{center}
-
-\section{K-means and K-nearest neighbor}
+\section{Approaches for book ratings}
+\subsection{K-means and K-nearest neighbor}
 We first tried a preliminary approach of K-means and K-nearest neighbor. We used $K = 20$ to cluster our set of users and then predicted the book ratings based on the cluster mean. For both approaches, we standardized the user book ratings matrix by subtracting the global mean and dividing by the global variance. The predictions made with the K-means approach were almost entirely filled with 4 ratings with 3.999 and 4.0001 appearing often as well. Diagnosing our approach, we realized that the sparsity of the user book ratings matrix had essentially substituted the global mean for all unfilled spots as we clustered the users together. This meant that this approach was heavily biased towards the global mean and the results show that. The K-means approach yielded a RMSE of 0.86903, which was just slightly above the global mean.
 
 We also attempted to use K-nearest neighbor approach where we calculated how close certain users are to each other by the number of books they have read in common and the average difference in ratings for those books. Calculating the hamming distance between users took nearly 4 hours with multiple runs due to small bugs. By that time, we decided it was more effective to pursue the probabilitistic matrix factorization approach, which, according to the Netflix competition paper, would capture unkown latent factors and be more predictive if implemented well. 
+
+\subsection{Principal Component Analysis}
+Principal component analysis (PCA) proved to be impractical for this problem because calculating the covariance matrix for the ratings was too computationally expensive, given that this is a$N\times D$ matrix where $N$ is the number of users and $D$ is the number of books.\\
+
+An alternate approach is to use single value decomposition (SVD) to find the user-book rating matrix without having to calculate the covariance matrix. The global mean was used for imputation for empty values. However, due the the extreme sparse data, imputation resulted in most of the values in the user-book rating matrix being extremely close to the global mean.
+
 
 \section{Matrix Factorization}
 \subsection{Algorithm}
@@ -127,6 +131,9 @@ The main issue we had with the matrix factorization approach was that there were
 \end{enumerate}
 
 \subsection{Results and Conclusion}
+We achieved our best RMSE value of 0.77857 with the probabilistic matrix factorization approach that the winners of the Netflix competition used. This was with latent factor $K = 1$, $\alpha = 0.001$, and $\beta = 0.0$, with no bias vectors. As noted, this is slightly better than the user mean RMSE value. 
+
+Increasing the number of latent factors seemed to make the results worse. Likewise, adding in the bias vectors or increasing $\beta$ also seemed to be detrimental to the results. This observation might be explained by the overfitting of the sparse data set. Having too many factors to learn from the training set causes the machine learning algorithm to overfit the training data and perform less optimally on the test set.
 
 
 \bibliography{library}
