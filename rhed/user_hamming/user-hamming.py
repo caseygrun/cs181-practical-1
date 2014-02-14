@@ -9,17 +9,15 @@ test_filename  = 'ratings-test.csv'
 training_data  = util.load_train(train_filename)
 test_queries   = util.load_test(test_filename)
 
-k = 3
+user_common_books = shared_utils.unpickle('user_common_books')
+user_difference_ratings = shared_utils.unpickle('user_difference_ratings')
 
-u_filename = 'U_' + str(k) + '_std'
-r_filename = 'R_' + str(k) + '_std'
-
-U = shared_utils.unpickle(u_filename)
-R = shared_utils.unpickle(r_filename)
+print user_common_books[0:]
+print user_difference_ratings[0:]
 
 ratings_filename = 'ratings_std'
 mother = shared_utils.unpickle(ratings_filename)
-
+'''
 for query in test_queries:
 	user = query['user']
 	user_cluster = numpy.dot(R[user - 1,:], range(k))
@@ -28,3 +26,4 @@ for query in test_queries:
 	query['rating'] = U[user_cluster][book_index] * mother['variance'] + mother['mean']
 
 util.write_predictions(test_queries, pred_filename)
+'''

@@ -80,7 +80,12 @@ We can see that for all 3 $k$s, the objective function never increases over the 
 We also implemented the K-Means++ algorithm. Shown below are mean images of the k clusters fo $k=5,10$. These are not qualitatively different from those of the K-Means algorithm. The objective function for $k=5$ reaches $J=2.15\times 10^{8}$, and for $k=10$ reaches $J=1.8\times 10^{8}$.
 
 \section{Approaches considered}
-K-Means, K-nearest neighbor, PCA, SVD, PMF
+\begin{center}K-Means, K-nearest neighbor, PCA, SVD, PMF\end{center}
+
+\section{K-means and K-nearest neighbor}
+We first tried a preliminary approach of K-means and K-nearest neighbor. We used $K = 20$ to cluster our set of users and then predicted the book ratings based on the cluster mean. For both approaches, we standardized the user book ratings matrix by subtracting the global mean and dividing by the global variance. The predictions made with the K-means approach were almost entirely filled with 4 ratings with 3.999 and 4.0001 appearing often as well. Diagnosing our approach, we realized that the sparsity of the user book ratings matrix had essentially substituted the global mean for all unfilled spots as we clustered the users together. This meant that this approach was heavily biased towards the global mean and the results show that. The K-means approach yielded a RMSE of 0.86903, which was just slightly above the global mean.
+
+We also attempted to use K-nearest neighbor approach where we calculated how close certain users are to each other by the number of books they have read in common and the average difference in ratings for those books. Calculating the hamming distance between users took nearly 4 hours with multiple runs due to small bugs. By that time, we decided it was more effective to pursue the probabilitistic matrix factorization approach, which, according to the Netflix competition paper, would capture unkown latent factors and be more predictive if implemented well. 
 
 \section{Probabilistic Matrix Factorization}
 \subsection{Derivation}
@@ -157,7 +162,7 @@ c_{j}   &\gets p_{i,k} + \alpha \left(2 \left(r_{i,j} - \hat{r}_{i,j}\right)    
 We update $\vec{p_i}$, $\vec{q_j}$, $b{i}$, and $c_{j}$ for each pair $(i, j, r_{i,j}) \in T$. This process is repeated for some number of steps, or \emph{epochs}, until either some criterion for epochs is met (e.g. the change in the total error $E$ is less than some $\epsilon$, or the maximum number of epochs is exceeded). 
 
 \subsection{Optimization}
-The main issue we had with the PMF approach was that there were lots of meta-parameters to tune: the learning rate $\alpha$, the regularization parameter $\beta$, the number of latent factors $K$, and the criteria for determining convergence. We estimated appropriate starting values for $K = 5$ and $\beta = 0.02$ based on literature on the Netflix prize \cite{Mnih:2007wg,Ott:2008tu}, and we experimented to determine that $\alpha = 0.001$ generally produced convergent solutions. We tried the following reductionist methods for validating our approach, and for further tuning these parameters:
+The main issue we had with the PMF approach was that there were many of meta-parameters to tune: the learning rate $\alpha$, the regularization parameter $\beta$, the number of latent factors $K$, and the criteria for determining convergence. We estimated appropriate starting values for $K = 5$ and $\beta = 0.02$ based on literature on the Netflix prize \cite{Mnih:2007wg,Ott:2008tu}, and we experimented to determine that $\alpha = 0.001$ generally produced convergent solutions. We tried the following reductionist methods for validating our approach, and for further tuning these parameters:
 
 \begin{enumerate}
 \item Checking the gradient. We verified that our gradient function was correct by finite differences.
