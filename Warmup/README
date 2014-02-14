@@ -1,0 +1,25 @@
+CS 181 Practice 1
+Sam Kim, Casey Grun, Rhed Shi
+
+This folder is included with a single CIFAR-10 dataset, named "data_batch_1".
+Both K-Means have K-Means++ have been implemented in Python.
+
+To run the K-Means algorithm on this dataset, type:
+
+python warmup.py
+
+By default, k=5. After the algorithm finishes, the progam will display the
+mean images of the clusters as well as a plot of the objective function as a
+function of iteration.
+
+To run the K-Means++ algorithm on this dataset, type:
+
+python warmup_plus.py
+
+By default, k=5. After the algorithm finishes, the progam will display the
+mean images of the clusters as well as a print the objective function.
+
+After running either K-Means or K-Means++ on the dataset, view the 25
+representative images (the closest images to the cluster means) by typing:
+
+python warmup_process.py
