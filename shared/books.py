@@ -57,6 +57,7 @@ def rmse_withheld(trainData, ratings_data, mfact_data, use_biases=False):
 				* scale + center
 
 		predictedR = max(1,min(5,predictedR))
+		print predictedR, r
 		error += (r - predictedR)**2
 		#print P[i,:],Q[j,:],predictedR,r
 

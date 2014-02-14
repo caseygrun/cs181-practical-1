@@ -8,7 +8,7 @@ import kmeans
 
 #data = load.load_CIFAR('data\warmup\cifar-10-batches-py\data_batch_1')
 #utils.pickle({'ks': ks, 'us': us, 'objectives': objectives}, "Sam/output/k10")
-results = utils.unpickle('Sam/output/k5')
+results = utils.unpickle('Sam/output/k15')
 #utils.pickle(kmeans.distances(data, us),'Sam/output/k10dists')
 #dists = utils.unpickle('Sam/output/k10dists')
 

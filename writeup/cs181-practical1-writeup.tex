@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{epstopdf}
+\usepackage{caption}
+\usepackage{subcaption}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
 % Declare commands
@@ -20,21 +22,53 @@
 
 \section{Warmup}
 We used the K-Means algorithm to cluster the images of the CIFAR-10 dataset, which consists of 60000 total 32x32 color images. We only clustered a single batch, consisting of 10000 images. The algorithm was run for $k=5,10,15$.\\
-The following sets of images show the mean images of the k clusters as well as the 25 images that are closest to each of the respective means, for $k=5,10,15$.\\
+The following sets of images show the mean images of the k clusters for $k=5,10,15$ as well as the 25 images that are closest to each of the respective means for $k=5,10$.\\
 
-\includegraphics[width=10cm]{images/k5us.png}\\
-\includegraphics[width=15cm]{images/k5reps.png}\\
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=8cm]{images/k5us.png}\\
+	\includegraphics[width=15cm]{images/k5reps.png}\\
+	\caption{(Top) Cluster means and (bottom) 25 representative images for each of the cluster means for $k=5$.}
+\end{figure}
 
-\includegraphics[width=10cm]{images/k10us.png}\\
-\includegraphics[width=15cm]{images/k10reps.png}\\
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=8cm]{images/k10us.png}\\
+	\includegraphics[width=15cm]{images/k10reps.png}\\
+	\caption{(Top) Cluster means and (bottom) 25 representative images for each of the cluster means for $k=10$.}
+\end{figure}
 
-Although features are not discernible from the mean images, there are still trends of lighter colors versus darker colors, which is consistent with the representative images. For example, in $k=5$, the 2nd cluster mean is mostly dark around the edges whereas the 4th cluster mean is mostly light around the edges, and the representative images share these features.\\
+\begin{figure}
+\centering
+\includegraphics[width=7cm]{images/k15us.png}
+\caption{Cluster means for $k=15$}
+\end{figure}
+
+Although features are not discernible from the mean images, there are still trends of lighter colors versus darker colors, which is consistent with the representative images. For example, in $k=5$, the 2nd cluster mean is mostly dark around the edges whereas the 4th cluster mean is mostly light around the edges, and the representative images share these features. Additionally, we see that as we increase $k$, the distinction between mean images increase as well. For $k=5$, the means are mostly greyish brown images, whereas for $k=15$, several of the mean images have tints of blue.\\
+
 We use the objective function:
 $$J(\{r_n\}^N_{n=1},\{\mu_k\}^K_{k=1})=\sum^N_{n=1}\sum^K_{k=1}r_{nk}||x_n-\mu_k||^2_2$$
 where $r_n$ is the responsibilities vector of the $n$th data point, $\mu_k$ is the mean of the $k$th cluster, and $x_n$ is the $n$th data point. Plots of the objective function as a function of iteration for $k=5,10,15$ are shown below.
 
-\includegraphics[width=7cm]{images/k5objectives.png}
-\includegraphics[width=7cm]{images/k10objectives.png}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{0.5\textwidth}
+		\includegraphics[width=7cm]{images/k5objectives.png}
+		\caption{$k=5$}
+	\end{subfigure}
+	\begin{subfigure}{0.3\textwidth}
+		\includegraphics[width=7cm]{images/k10objectives.png}
+		\caption{$k=10$}
+	\end{subfigure}
+	\begin{subfigure}{0.3\textwidth}
+		\includegraphics[width=7cm]{images/k15objectives.png}
+		\caption{$k=15$}
+	\end{subfigure}
+	\caption{Objective function as a function of iteration for K-Means}
+\end{figure}
+
+We can see that for all 3 $k$s, the objective function never increases over the iteration, so the algorithm is constantly finding a better solution and converging to a (local) minimum. In addition, comparing the objective functions, $k=5$ reaches approximately $J=2.2\times 10^{8}$, $k=10$ converges to $J=1.8\times 10^{8}$, and $k=15$ converges to $J=1.7\times 10^{8}$.
 
 \section{Approaches considered}
 K-Means, K-nearest neighbor, PCA, SVD, PMF

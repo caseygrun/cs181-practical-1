@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------
 # CS 181 | Practical 1 | Predictions
 # Casey Grun
-# 
+#
 # mf.py
 # Does matrix factorization
 # ----------------------------------------------------------------------------
@@ -26,8 +26,8 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
 
 	Arguments:
-		R       	: the set of known ratings, given as a list of tuples 
-					(i, j, r) where i is the index of the user, j is the index 
+		R       	: the set of known ratings, given as a list of tuples
+					(i, j, r) where i is the index of the user, j is the index
 					of the book, and r is the rating
 		K       	: the number of latent features
 		steps   	: the maximum number of steps (epochs) to perform the optimisation
@@ -44,7 +44,7 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 		"Bd"    	: an array (D x 1) containing book biases
 		"mean"  	: the global mean of the initial rankings
 	"""
-	
+
 	# initialize random user and book feature matrices
 	P = np.random.rand(N,K)
 	Q = np.random.rand(D,K)
@@ -71,7 +71,7 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 	debug("Calculating mean of R...")
 	mean = 1./len(R) * float(sum([ Rij for (i,j,Rij) in R ]))
 	debug("Mean: %f", (mean,))
-    debug("alpha: %f, beta: %f, epsilon: %f", (alpha, beta, epsilon))
+	debug("alpha: %f, beta: %f, epsilon: %f", (alpha, beta, epsilon))
 
 	t = time.clock()
 	debug("Starting Matrix Factorization into %d principal components...", (K,))
@@ -83,10 +83,10 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 
 	# for each step (epoch)
 	for step in xrange(steps):
-		
+
 		# remember the previous error
 		ep = e
-		
+
 		# calculate the total error, e
 		e = 0
 		for (i,j,Rij) in R:
@@ -114,23 +114,23 @@ def mfact2(R, N, D, K, steps=500, alpha=0.01, beta=0.02, epsilon=0.001, save_eve
 		# dQ = np.zeros_like(Q)
 		# dBn = np.zeros_like(Bn)
 		# dBd = np.zeros_like(Bd)
-		
+
 		# calculate gradient
 		for (i,j,Rij) in R:
 			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
 			P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
 			Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
 			if use_bias:
-				Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
-				Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
-			
+				Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i])
+				Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j])
+
 		# 	dP[i,:] += alpha * (2 * eij * Q[j,:] - beta * P[i,:])
 
 		# 	# if (not fix_q):
 		# 	dQ[j,:] += alpha * (2 * eij * P[i,:] - beta * Q[j,:])
 		# 	if use_bias:
-		# 		dBn[i]  += alpha * (2 * eij          - beta * Bn[i]) 
-		# 		dBd[j]  += alpha * (2 * eij          - beta * Bd[j]) 
+		# 		dBn[i]  += alpha * (2 * eij          - beta * Bn[i])
+		# 		dBd[j]  += alpha * (2 * eij          - beta * Bd[j])
 
 		# # # update P, Q, Bn, Bd
 		# P += dP
@@ -151,15 +151,15 @@ mfact = mfact2
 # steps=5000, alpha=0.0002, beta=0.02, epsilon=0.001, save_every=20
 def mfact_debug(R, N, D, K, steps=500, alpha=0.001, beta=0.00, epsilon=0.001, save_every=20, use_bias=True, filename=None):
 	"""
-	
+
 	THIS ONE RECAPITULATES THE USER MEAN
 
 	Adapted from Albert Au Yeung (2010)
 	http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
 
 	Arguments:
-		R       	: the set of known ratings, given as a list of tuples 
-					(i, j, r) where i is the index of the user, j is the index 
+		R       	: the set of known ratings, given as a list of tuples
+					(i, j, r) where i is the index of the user, j is the index
 					of the book, and r is the rating
 		K       	: the number of latent features
 		steps   	: the maximum number of steps (epochs) to perform the optimisation
@@ -176,7 +176,7 @@ def mfact_debug(R, N, D, K, steps=500, alpha=0.001, beta=0.00, epsilon=0.001, sa
 		"Bd"    	: an array (D x 1) containing book biases
 		"mean"  	: the global mean of the initial rankings
 	"""
-	
+
 	# initialize random user and book feature matrices
 	P = np.random.rand(N,K)
 	Q = np.ones((D,K))
@@ -212,10 +212,10 @@ def mfact_debug(R, N, D, K, steps=500, alpha=0.001, beta=0.00, epsilon=0.001, sa
 
 	# for each step (epoch)
 	for step in xrange(steps):
-		
+
 		# remember the previous error
 		ep = e
-		
+
 		# calculate the total error, e
 		e = 0
 		for (i,j,Rij) in R:
@@ -243,22 +243,22 @@ def mfact_debug(R, N, D, K, steps=500, alpha=0.001, beta=0.00, epsilon=0.001, sa
 		# dQ = np.zeros_like(Q)
 		# dBn = np.zeros_like(Bn)
 		# dBd = np.zeros_like(Bd)
-		
+
 		# calculate gradient
 		for (i,j,Rij) in R:
 			eij = Rij - (mean + Bn[i] + Bd[j] + np.dot(P[i,:],Q[j,:]))
 			P[i,:] = P[i,:] + alpha * (2 * eij * Q[j,:] - beta * P[i,:])
 			# Q[j,:] = Q[j,:] + alpha * (2 * eij * P[i,:] - beta * Q[j,:])
-			# Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i]) 
-			# Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j]) 
-			
+			# Bn[i]  = Bn[i]  + alpha * (2 * eij          - beta * Bn[i])
+			# Bd[j]  = Bd[j]  + alpha * (2 * eij          - beta * Bd[j])
+
 			# dP[i,:] += alpha * (2 * eij * Q[j,:] - beta * P[i,:])
 
 			# if (not fix_q):
 			# 	dQ[j,:] += alpha * (2 * eij * P[i,:] - beta * Q[j,:])
 			# if use_bias:
-			# 	dBn[i]  += alpha * (2 * eij          - beta * Bn[i]) 
-			# 	dBd[j]  += alpha * (2 * eij          - beta * Bd[j]) 
+			# 	dBn[i]  += alpha * (2 * eij          - beta * Bn[i])
+			# 	dBd[j]  += alpha * (2 * eij          - beta * Bd[j])
 
 		# # update P, Q, Bn, Bd
 		# P += dP
