@@ -87,41 +87,11 @@ We first tried a preliminary approach of K-means and K-nearest neighbor. We used
 
 We also attempted to use K-nearest neighbor approach where we calculated how close certain users are to each other by the number of books they have read in common and the average difference in ratings for those books. Calculating the hamming distance between users took nearly 4 hours with multiple runs due to small bugs. By that time, we decided it was more effective to pursue the probabilitistic matrix factorization approach, which, according to the Netflix competition paper, would capture unkown latent factors and be more predictive if implemented well. 
 
-\section{Probabilistic Matrix Factorization}
-\subsection{Derivation}
+\section{Matrix Factorization}
+\subsection{algorithm}
 The probabilistic matrix factorization (PMF) approach \cite{Mnih:2007wg} attempts to decompose the ratings matrix $\mat{R}$ into two matrices: $\mat{P}$ representing the users and $\mat{Q}$ representing the books:
 $$\mat{R} = \mat{P} \times \mat{Q}^T$$
-where:
-$$ 
-\mat{P} = 
-\begin{pmatrix}
-	\vec{p_1} \\
-	\vec{p_2} \\
-	\vdots    \\
-	\vec{p_N} 
-\end{pmatrix} = 
-\begin{pmatrix}
-	p_{1,1} & p_{1,2} & \ldots & p_{1,K} \\
-	p_{2,1} & p_{2,2} & \ldots & p_{2,K} \\
-	\vdots  & \vdots  & \ddots & \vdots  \\
-	p_{N,1} & p_{N,2} & \ldots & p_{N,K} \\
-\end{pmatrix}
-$$
-$$ 
-\mat{Q} = 
-\begin{pmatrix}
-	\vec{q_1} \\
-	\vec{q_2} \\
-	\vdots    \\
-	\vec{q_N} 
-\end{pmatrix} = 
-\begin{pmatrix}
-	q_{1,1} & q_{1,2} & \ldots & q_{1,K} \\
-	q_{2,1} & q_{2,2} & \ldots & q_{2,K} \\
-	\vdots  & \vdots  & \ddots & \vdots  \\
-	q_{N,1} & q_{N,2} & \ldots & q_{N,K} \\
-\end{pmatrix}
-$$
+
 Each entry $\vec{p_i}$ in $\mat{P}$ represents a vector of $K$ latent features of user $i$, while $\vec{q_j}$ represents the $k$ latent factors of the book. If we can produce the matrices $\mat{P}$ and $\mat{Q}$, we can predict any entry $r_{i,j}$ in $\mat{R}$ by taking inner products of the vectors $\vec{p_i}$ and $\vec{q_j}$:
 $$\hat{r}_{i,j} = \vec{p_i} \cdot \vec{q_j}^T \approx r_{i,j}$$
 
@@ -134,24 +104,11 @@ $$\mat{R} \approx \mat{P} \times \mat{Q}^T + (\mu + \vec{b} \otimes \vec{c})$$
 where $\otimes$ is the outer product.
 
 To learn the values of $\mat{P}$ and $\mat{Q}$, we will minimize an error function:
-$$E = \sum_{i,j,r_{i,j} \in T} e_{i,j} $$
 $$E = \sum_{i,j,r_{i,j} \in T} \left(r_{i,j} - \hat{r}_{i,j}\right)^2 + \frac{\beta}{2} \left( ||p_i||^2 + ||q_i||^2 + b_i^2 + b_j^2 \right) $$
 The first term of this error function simply describes the squared reconstruction error. The second term enforces regularization---penalizing rows of $\mat{P}$ and $\mat{Q}$ that have high magnitude. 
 
-From this expression, we can derive $\nabla e_{i,j}$; this will allow us to minimize $e_{i,j}$ (and hence $E$) by stochastic gradient descent.
+We use $\nabla e_{i,j}$, the gradient , to minimize $e_{i,j}$ (and hence $E$) by stochastic gradient descent.
 
-\begin{align*}
-\frac{\partial e_{i,j}}{\partial p_{i,k}} &= \frac{\partial}{\partial p_{i,k}} \left(r_{i,j} - \hat{r}_{i,j}\right)^2 + \frac{\partial}{\partial p_{i,k}} \frac{\beta}{2} \left( ||p_i||^2 + ||q_i||^2 + b_i^2 + b_j^2 \right) \\
-    &= 2 \left(r_{i,j} - \hat{r}_{i,j}\right)  \left(-\frac{\partial}{\partial p_{i,k}} \hat{r}_{i,j}\right)  + \frac{\partial}{\partial p_{i,k}} \frac{\beta}{2} \left( ||p_i||^2\right) \\
-    &= 2 \left(r_{i,j} - \hat{r}_{i,j}\right)  \left(-\frac{\partial}{\partial p_{i,k}} \left(\mu + b_i + c_j + \vec{p_i} \cdot \vec{q_j}^T \right) \right)  + \frac{\partial}{\partial p_{i,k}} \frac{\beta}{2} \left( ||p_i||^2 \right) \\
-    &= 2 \left(r_{i,j} - \hat{r}_{i,j}\right)  \left(-\frac{\partial}{\partial p_{i,k}} \left( \sum_{k=1}^{K} p_{i,k} q_{j,k} \right) \right)  + \frac{\partial}{\partial p_{i,k}} \frac{\beta}{2} \left( \sum_{k=1}^{K} p_{i,k}^2 \right) \\
-    &= -2 \left(r_{i,j} - \hat{r}_{i,j}\right)  \left(q_{j,k} \right) + \beta p_{i,k} \\
-\frac{\partial e_{i,j}}{\partial q_{j,k}} &= -2 \left(r_{i,j} - \hat{r}_{i,j}\right)  \left(p_{i,k} \right) + \beta q_{j,k} \\
-\frac{\partial e_{i,j}}{\partial b_{i}} &= -2 \left(r_{i,j} - \hat{r}_{i,j}\right) + \beta b_{i} \\
-\frac{\partial e_{i,j}}{\partial c_{j}} &= -2 \left(r_{i,j} - \hat{r}_{i,j}\right) + \beta c_{j}
-\end{align*}
-
-We can therefore implement a set of update rules as follows:
 \begin{align*}
 p_{i,k} &\gets p_{i,k} + \alpha \left(2 \left(r_{i,j} - \hat{r}_{i,j}\right)  q_{j,k} - \beta p_{i,k} \right) \\
 q_{j,k} &\gets p_{i,k} + \alpha \left(2 \left(r_{i,j} - \hat{r}_{i,j}\right)  p_{i,k} - \beta q_{j,k} \right) \\
